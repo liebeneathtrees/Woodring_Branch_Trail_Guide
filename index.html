@@ -125,6 +125,39 @@
     padding: 6px 0 8px 0;
     cursor: pointer;
     user-select: none;
+    list-style: none;
+  }
+
+  .category-head::-webkit-details-marker { display: none; }
+
+  .category-head::before {
+    content: '+ ';
+    color: #a9baa1;
+    font-size: 0.9rem;
+  }
+
+  details[open] > .category-head::before {
+    content: '\2212 ';
+  }
+
+  .species-subhead {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 0 5px 0;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    color: #b7c4ae;
+  }
+
+  .species-subhead .count {
+    margin-left: auto;
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 400;
+    color: #8a9484;
   }
 
   .category-head input {
@@ -281,6 +314,23 @@
     gap: 4px;
   }
 
+  .seasonal-group {
+    margin-bottom: 10px;
+  }
+
+  .seasonal-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .seasonal-group-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    color: #b7c4ae;
+    margin-bottom: 4px;
+  }
+
   .seasonal-item {
     display: block;
     width: 100%;
@@ -434,20 +484,6 @@
   }
 
   .observation-box a { color: #17504b; font-weight: 600; }
-
-  .picks-group-title {
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #a9baa1;
-    margin: 12px 0 4px 4px;
-  }
-
-  details.picks-group { margin: 4px 0; }
-  summary.picks-group-title { cursor: pointer; list-style: none; padding: 6px 4px; }
-  summary.picks-group-title::-webkit-details-marker { display: none; }
-  summary.picks-group-title::before { content: '\25B8'; display: inline-block; width: 1em; }
-  details.picks-group[open] > summary.picks-group-title::before { content: '\25BE'; }
 
   .challenge-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
   .challenge-tabs button {
@@ -610,6 +646,22 @@
   }
 
   .sightings-note.is-error { color: #e0a58f; }
+
+  /* Inside the Filters panel the note sits on the light card, not the dark
+     sidebar, so it needs darker text to stay readable. */
+  .filters-panel .sightings-note { color: #6b6253; margin: 0 0 6px 25px; }
+  .filters-panel .sightings-note.is-error { color: #a0452b; }
+
+  /* Leaflet's own CSS sets z-index: 1000 on .leaflet-bottom itself (the
+     positioned container that holds the attribution, zoom, and locate
+     controls), not on the attribution control alone -- that outer
+     container is what actually establishes the stacking context, so
+     overriding only the inner .leaflet-control-attribution has no effect.
+     Lowering the container below the mobile info-panel's 950 lets the
+     bottom sheet properly cover the attribution text when it's open. */
+  .leaflet-bottom {
+    z-index: 900 !important;
+  }
 
   .main {
     display: flex;
@@ -1773,39 +1825,6 @@
 
     <hr class="divider">
 
-    <div class="category-block" id="sightings-block">
-      <label class="category-head">
-        <input type="checkbox" id="sightings-master-toggle" autocomplete="off">
-        <span class="dot" style="background:#3d6b8a"></span>
-        <span class="label">Community Sightings</span>
-      </label>
-      <div class="sightings-sub-filters" id="sightings-sub-filters">
-        <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="plants"> Plants</label>
-        <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="fungi"> Fungi &amp; Lichens</label>
-        <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="birds"> Birds</label>
-        <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="mammals"> Mammals</label>
-        <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="herps"> Reptiles &amp; Amphibians</label>
-        <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="insects"> Insects &amp; Spiders</label>
-        <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="other"> Other Wildlife</label>
-      </div>
-      <p class="sightings-note" id="sightings-note">Real sightings logged by naturalists near the park, via iNaturalist.</p>
-    </div>
-
-    <hr class="divider">
-
-    <div class="category-block" id="picks-block">
-      <label class="category-head">
-        <input type="checkbox" id="picks-master-toggle" checked autocomplete="off">
-        <span class="dot" style="background:#2a8f86"></span>
-        <span class="label">Community Picks</span>
-        <span class="count" id="picks-count">0</span>
-      </label>
-      <p class="sightings-note">Representative species documented here by iNaturalist observers. Each pin marks where a species was recorded, not a guarantee it is there today, and the observer is credited on every card.</p>
-      <div id="picks-list"></div>
-    </div>
-
-    <hr class="divider">
-
     <div id="sidebar-categories"></div>
 
     <hr class="divider">
@@ -1909,7 +1928,8 @@
   //   connections -- optional array of { id, relationship }. Only include a connection
   //                  when it's ecologically real (shared habitat, food source, competition,
   //                  etc.) -- don't force a link between species that don't actually interact.
-  //   phenology  -- optional array of { months: [1-12,...], label }. Marks specific windows
+  //   phenology  -- optional array of { months: [1-12,...], label, category }, category one of
+  //                 Flowering / Fruiting / Active / Notable to Spot. Marks specific windows
   //                 (flowering, fruiting, migration, etc.) used to power the "This Month"
   //                 widget and in-season badge. Omit entirely for species without a
   //                 meaningful seasonal spike (e.g. a bird present and active year-round).
@@ -1970,7 +1990,8 @@
             10,
             11
           ],
-          "label": "Acorns ripen and drop"
+          "label": "Acorns ripen and drop",
+          "category": "Fruiting"
         }
       ],
       "learnMoreLinks": [
@@ -2017,7 +2038,8 @@
             5,
             6
           ],
-          "label": "Green galls swell on oak leaves"
+          "label": "Green galls swell on oak leaves",
+          "category": "Notable to Spot"
         }
       ],
       "learnMoreLinks": [
@@ -2068,7 +2090,8 @@
             6,
             7
           ],
-          "label": "Adults chew leaf edges"
+          "label": "Adults chew leaf edges",
+          "category": "Active"
         }
       ],
       "learnMoreLinks": [
@@ -2122,14 +2145,16 @@
             2,
             3
           ],
-          "label": "Tiny red flowers open before the leaves"
+          "label": "Tiny red flowers open before the leaves",
+          "category": "Flowering"
         },
         {
           "months": [
             9,
             10
           ],
-          "label": "Leaves turn red early in fall"
+          "label": "Leaves turn red early in fall",
+          "category": "Notable to Spot"
         }
       ],
       "learnMoreLinks": [
@@ -2180,14 +2205,16 @@
             8,
             9
           ],
-          "label": "Greenish-yellow flower clusters"
+          "label": "Greenish-yellow flower clusters",
+          "category": "Flowering"
         },
         {
           "months": [
             10,
             11
           ],
-          "label": "Leaves turn fiery red"
+          "label": "Leaves turn fiery red",
+          "category": "Notable to Spot"
         },
         {
           "months": [
@@ -2195,7 +2222,8 @@
             1,
             2
           ],
-          "label": "Ruby-red fruit clusters hang on"
+          "label": "Ruby-red fruit clusters hang on",
+          "category": "Fruiting"
         }
       ],
       "learnMoreLinks": [
@@ -2250,7 +2278,8 @@
             9,
             10
           ],
-          "label": "Adults on the wing"
+          "label": "Adults on the wing",
+          "category": "Active"
         }
       ],
       "learnMoreLinks": [
@@ -2309,7 +2338,8 @@
             5,
             6
           ],
-          "label": "Bell-shaped flowers open"
+          "label": "Bell-shaped flowers open",
+          "category": "Flowering"
         },
         {
           "months": [
@@ -2317,7 +2347,8 @@
             10,
             11
           ],
-          "label": "Orange fruit ripens"
+          "label": "Orange fruit ripens",
+          "category": "Fruiting"
         }
       ],
       "learnMoreLinks": [
@@ -2376,7 +2407,8 @@
             1,
             2
           ],
-          "label": "Cubs are born in winter dens"
+          "label": "Cubs are born in winter dens",
+          "category": "Active"
         }
       ],
       "learnMoreLinks": [
@@ -2425,7 +2457,8 @@
             9,
             10
           ],
-          "label": "Red-orange caps appear on the ground"
+          "label": "Red-orange caps appear on the ground",
+          "category": "Fruiting"
         }
       ],
       "learnMoreLinks": [
@@ -2474,7 +2507,8 @@
             9,
             10
           ],
-          "label": "Brackets grow on oak wood"
+          "label": "Brackets grow on oak wood",
+          "category": "Fruiting"
         }
       ],
       "learnMoreLinks": [
@@ -2620,14 +2654,16 @@
             4,
             5
           ],
-          "label": "Fuzzy fiddleheads unfurl beside cinnamon-brown spore fronds"
+          "label": "Fuzzy fiddleheads unfurl beside cinnamon-brown spore fronds",
+          "category": "Notable to Spot"
         },
         {
           "months": [
             10,
             11
           ],
-          "label": "Fronds turn yellow to rusty brown"
+          "label": "Fronds turn yellow to rusty brown",
+          "category": "Notable to Spot"
         }
       ],
       "learnMoreLinks": [
@@ -2672,7 +2708,8 @@
             4,
             5
           ],
-          "label": "Fiddleheads unfurl"
+          "label": "Fiddleheads unfurl",
+          "category": "Notable to Spot"
         }
       ],
       "learnMoreLinks": [
@@ -2717,7 +2754,8 @@
             7,
             8
           ],
-          "label": "Dark, narrow spore fronds appear"
+          "label": "Dark, narrow spore fronds appear",
+          "category": "Notable to Spot"
         }
       ],
       "learnMoreLinks": [
@@ -2758,7 +2796,8 @@
             4,
             5
           ],
-          "label": "Jug-shaped flowers hide under the leaves"
+          "label": "Jug-shaped flowers hide under the leaves",
+          "category": "Flowering"
         }
       ],
       "learnMoreLinks": [
@@ -2803,7 +2842,8 @@
             7,
             8
           ],
-          "label": "Nodding white flowers open"
+          "label": "Nodding white flowers open",
+          "category": "Flowering"
         }
       ],
       "learnMoreLinks": [
@@ -2848,7 +2888,8 @@
             3,
             4
           ],
-          "label": "Yellow star-shaped flowers open"
+          "label": "Yellow star-shaped flowers open",
+          "category": "Flowering"
         }
       ],
       "learnMoreLinks": [
@@ -2890,7 +2931,8 @@
             10,
             11
           ],
-          "label": "Pink to purple flowers on forked stems"
+          "label": "Pink to purple flowers on forked stems",
+          "category": "Flowering"
         }
       ],
       "learnMoreLinks": [
@@ -2935,7 +2977,8 @@
             4,
             5
           ],
-          "label": "Lavender flowers with yellow crests"
+          "label": "Lavender flowers with yellow crests",
+          "category": "Flowering"
         }
       ],
       "learnMoreLinks": [
@@ -2987,7 +3030,8 @@
             5,
             6
           ],
-          "label": "Paired white flowers open"
+          "label": "Paired white flowers open",
+          "category": "Flowering"
         },
         {
           "months": [
@@ -2996,7 +3040,8 @@
             9,
             10
           ],
-          "label": "Red two-dimpled berries ripen"
+          "label": "Red two-dimpled berries ripen",
+          "category": "Fruiting"
         }
       ],
       "learnMoreLinks": [
@@ -3048,7 +3093,8 @@
             8,
             9
           ],
-          "label": "Flower sprays turn to dark berry clusters"
+          "label": "Flower sprays turn to dark berry clusters",
+          "category": "Fruiting"
         }
       ],
       "learnMoreLinks": [
@@ -3093,7 +3139,8 @@
             5,
             6
           ],
-          "label": "Scarlet flowers open"
+          "label": "Scarlet flowers open",
+          "category": "Flowering"
         }
       ],
       "learnMoreLinks": [
@@ -3139,7 +3186,8 @@
             8,
             9
           ],
-          "label": "Bright yellow sunflower-like blooms"
+          "label": "Bright yellow sunflower-like blooms",
+          "category": "Flowering"
         }
       ],
       "learnMoreLinks": [
@@ -3188,14 +3236,16 @@
             2,
             3
           ],
-          "label": "Spotted leaf with a purple underside on the forest floor"
+          "label": "Spotted leaf with a purple underside on the forest floor",
+          "category": "Notable to Spot"
         },
         {
           "months": [
             7,
             8
           ],
-          "label": "Slender flower stalks bloom"
+          "label": "Slender flower stalks bloom",
+          "category": "Flowering"
         }
       ],
       "learnMoreLinks": [
@@ -3240,7 +3290,8 @@
             4,
             5
           ],
-          "label": "Nodding pink flowers beneath three leaves"
+          "label": "Nodding pink flowers beneath three leaves",
+          "category": "Flowering"
         }
       ],
       "learnMoreLinks": [
@@ -3285,7 +3336,8 @@
             4,
             5
           ],
-          "label": "Yellow nodding flowers open"
+          "label": "Yellow nodding flowers open",
+          "category": "Flowering"
         }
       ],
       "learnMoreLinks": [
@@ -3336,20 +3388,23 @@
             3,
             4
           ],
-          "label": "White flowers open before the leaves"
+          "label": "White flowers open before the leaves",
+          "category": "Flowering"
         },
         {
           "months": [
             5,
             6
           ],
-          "label": "Berries ripen from red to purple"
+          "label": "Berries ripen from red to purple",
+          "category": "Fruiting"
         },
         {
           "months": [
             10
           ],
-          "label": "Leaves turn gold to orange-red"
+          "label": "Leaves turn gold to orange-red",
+          "category": "Notable to Spot"
         }
       ],
       "learnMoreLinks": [
@@ -3394,7 +3449,8 @@
             5,
             6
           ],
-          "label": "Pink-white flower clusters open"
+          "label": "Pink-white flower clusters open",
+          "category": "Flowering"
         }
       ],
       "learnMoreLinks": [
@@ -3439,7 +3495,8 @@
             9,
             10
           ],
-          "label": "Warty capsules split to show red seeds"
+          "label": "Warty capsules split to show red seeds",
+          "category": "Fruiting"
         }
       ],
       "learnMoreLinks": [
@@ -3499,7 +3556,8 @@
             5,
             6
           ],
-          "label": "Bell-shaped flowers open"
+          "label": "Bell-shaped flowers open",
+          "category": "Flowering"
         },
         {
           "months": [
@@ -3507,7 +3565,8 @@
             8,
             9
           ],
-          "label": "Large blue-black berries ripen"
+          "label": "Large blue-black berries ripen",
+          "category": "Fruiting"
         }
       ],
       "learnMoreLinks": [
@@ -3566,7 +3625,8 @@
             9,
             10
           ],
-          "label": "Adults fly at night"
+          "label": "Adults fly at night",
+          "category": "Active"
         }
       ],
       "learnMoreLinks": [
@@ -3625,7 +3685,8 @@
             9,
             10
           ],
-          "label": "Adults on the wing"
+          "label": "Adults on the wing",
+          "category": "Active"
         }
       ],
       "learnMoreLinks": [
@@ -3740,7 +3801,8 @@
             9,
             10
           ],
-          "label": "Adults on the wing"
+          "label": "Adults on the wing",
+          "category": "Active"
         }
       ],
       "learnMoreLinks": [
@@ -3820,7 +3882,8 @@
             9,
             10
           ],
-          "label": "Head-up spiders hang in trailside webs"
+          "label": "Head-up spiders hang in trailside webs",
+          "category": "Active"
         }
       ],
       "learnMoreLinks": [
@@ -3972,7 +4035,8 @@
             5,
             6
           ],
-          "label": "Males call from shallow water"
+          "label": "Males call from shallow water",
+          "category": "Active"
         }
       ],
       "learnMoreLinks": [
@@ -4247,7 +4311,8 @@
             2,
             3
           ],
-          "label": "Loons rest and feed on large lakes"
+          "label": "Loons rest and feed on large lakes",
+          "category": "Active"
         }
       ],
       "learnMoreLinks": [
@@ -4320,19 +4385,27 @@
     const monthName = MONTH_NAMES[currentMonth - 1];
     const widget = document.getElementById('seasonal-widget');
 
-    const matches = [];
+    // A fixed display order so the same categories always appear in the same
+    // place from month to month, rather than shuffling with the data order.
+    const CATEGORY_ORDER = ['Flowering', 'Fruiting', 'Active', 'Notable to Spot'];
+    const byCategory = {};
     const seenNames = new Set();
     allEntries.forEach(s => {
-      const label = getCurrentPhenologyLabel(s);
-      // Skip if we've already listed this species from a different pin --
-      // e.g. two Kudzu pins shouldn't produce two identical entries here.
-      if (label && !seenNames.has(s.name)) {
-        matches.push({ id: s.id, name: s.name, label });
+      if (!s.phenology) return;
+      const match = s.phenology.find(p => p.months.includes(currentMonth));
+      // Skip if we've already listed this species from a different pin.
+      if (match && !seenNames.has(s.name)) {
+        const cat = match.category || 'Notable to Spot';
+        (byCategory[cat] = byCategory[cat] || []).push({ id: s.id, name: s.name, label: match.label });
         seenNames.add(s.name);
       }
     });
 
-    if (matches.length === 0) {
+    const categoriesPresent = CATEGORY_ORDER.filter(c => byCategory[c] && byCategory[c].length);
+    // Keeps an unexpected category from being silently dropped.
+    Object.keys(byCategory).forEach(c => { if (!categoriesPresent.includes(c)) categoriesPresent.push(c); });
+
+    if (categoriesPresent.length === 0) {
       widget.innerHTML = `
         <div class="seasonal-title">This Month at Woodring Branch</div>
         <p class="seasonal-empty">${allEntries.length === 0
@@ -4342,15 +4415,22 @@
       return;
     }
 
-    const itemsHtml = matches.map(m => `
-      <button type="button" class="seasonal-item" data-target="${m.id}">
-        <span class="seasonal-label">${m.label}</span>${m.name}
-      </button>
+    const groupsHtml = categoriesPresent.map(cat => `
+      <div class="seasonal-group">
+        <div class="seasonal-group-title">${cat}</div>
+        <div class="seasonal-items">
+          ${byCategory[cat].map(m => `
+            <button type="button" class="seasonal-item" data-target="${m.id}">
+              <span class="seasonal-label">${m.label}</span>${m.name}
+            </button>
+          `).join('')}
+        </div>
+      </div>
     `).join('');
 
     widget.innerHTML = `
       <div class="seasonal-title">This Month at Woodring Branch: ${monthName}</div>
-      <div class="seasonal-items">${itemsHtml}</div>
+      ${groupsHtml}
     `;
 
     widget.querySelectorAll('.seasonal-item').forEach(btn => {
@@ -4496,9 +4576,9 @@
     }
   }
 
-  const sightingsNoteEl = document.getElementById('sightings-note');
-  const SIGHTINGS_DEFAULT_NOTE = sightingsNoteEl.textContent;
-
+  // sightingsNoteEl / SIGHTINGS_DEFAULT_NOTE are looked up further down, once
+  // the Filters panel (which now holds the note) exists. These functions only
+  // run after the layer is switched on, which is always later than that.
   function showStatus(message, isError) {
     sightingsNoteEl.textContent = message;
     sightingsNoteEl.classList.toggle('is-error', !!isError);
@@ -4622,41 +4702,6 @@
     }
   }
 
-  const sightingsMasterToggle = document.getElementById('sightings-master-toggle');
-  const sightingsSubFilters = document.getElementById('sightings-sub-filters');
-
-  // Browsers restore checkbox states on page load/refresh based on what was
-  // last clicked, independent of the HTML's declared default -- this is what
-  // caused the master toggle to visually appear checked while the page's
-  // actual data state (sightingsEnabled = false) hadn't caught up, so no
-  // pins showed until it was toggled off and back on. Forcing all of these
-  // checkboxes to known values here keeps what's on screen honest.
-  sightingsMasterToggle.checked = false;
-  sightingsSubFilters.classList.remove('visible');
-  sightingsSubFilters.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-    cb.checked = true;
-    sightingBucketState[cb.dataset.bucket] = true;
-  });
-
-  // The sidebar checkbox just changes actual layer presence on the map --
-  // all the real logic (fetching, sub-filter visibility, syncing the layer
-  // control's own checkbox) happens in the overlayadd/overlayremove
-  // handlers below, so both entry points stay in sync automatically.
-  sightingsMasterToggle.addEventListener('change', (e) => {
-    if (e.target.checked) {
-      map.addLayer(sightingsLayer);
-    } else {
-      map.removeLayer(sightingsLayer);
-    }
-  });
-
-  sightingsSubFilters.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', (e) => {
-      sightingBucketState[e.target.dataset.bucket] = e.target.checked;
-      applySightingFilters();
-    });
-  });
-
   const layerControl = L.control.layers({
     "Street map": streetLayer,
     "Satellite": L.layerGroup([satelliteLayer, satelliteLabels]),
@@ -4664,30 +4709,6 @@
     "USGS Topo": usgsTopoLayer
   }, null, { position: 'topright', collapsed: window.matchMedia('(max-width: 760px)').matches }).addTo(map);
 
-  // Registered here, before the Trails/Areas overlays are added further
-  // down, so it appears between the base layers and those in the control.
-  layerControl.addOverlay(sightingsLayer, "Community Sightings (iNaturalist)");
-
-  map.on('overlayadd', (e) => {
-    if (e.layer !== sightingsLayer) return;
-    sightingsEnabled = true;
-    sightingsMasterToggle.checked = true;
-    sightingsSubFilters.classList.add('visible');
-    if (!sightingsLoaded) {
-      fetchCommunitySightings();
-    } else {
-      applySightingFilters();
-    }
-  });
-
-  map.on('overlayremove', (e) => {
-    if (e.layer !== sightingsLayer) return;
-    sightingsEnabled = false;
-    sightingsMasterToggle.checked = false;
-    sightingsSubFilters.classList.remove('visible');
-    hideStatus();
-    applySightingFilters();
-  });
 
 
   // ---- MOBILE DRAWER / BOTTOM SHEET ----
@@ -4818,56 +4839,6 @@
     markerById[s.id] = marker;
   });
 
-  layerControl.addOverlay(communityClusterGroup, "Community Picks (iNaturalist)");
-
-  const picksMasterToggle = document.getElementById('picks-master-toggle');
-  const picksListEl = document.getElementById('picks-list');
-  document.getElementById('picks-count').textContent = communityPicks.length;
-
-  // Sidebar list, grouped by category
-  ['tree', 'plant', 'animal', 'fungi'].forEach(cat => {
-    const items = communityPicks.filter(s => s.category === cat);
-    if (items.length === 0) return;
-    const group = document.createElement('details');
-    group.className = 'picks-group';
-    const title = document.createElement('summary');
-    title.className = 'picks-group-title';
-    title.textContent = `${categoryMeta[cat].label} (${items.length})`;
-    group.appendChild(title);
-    const list = document.createElement('div');
-    list.className = 'species-list';
-    items.forEach(s => {
-      const row = document.createElement('button');
-      row.className = 'species-row';
-      row.type = 'button';
-      row.innerHTML = `<span class="common">${s.name}</span><span class="sci">${s.sciName}</span>`;
-      row.addEventListener('click', () => selectSpecies(s.id));
-      rowById[s.id] = row;
-      list.appendChild(row);
-    });
-    group.appendChild(list);
-    picksListEl.appendChild(group);
-  });
-
-  // Master toggle and the map's layer menu stay in sync.
-  picksMasterToggle.addEventListener('change', (e) => {
-    if (e.target.checked) {
-      map.addLayer(communityClusterGroup);
-    } else {
-      map.removeLayer(communityClusterGroup);
-    }
-  });
-  map.on('overlayadd', (e) => {
-    if (e.layer !== communityClusterGroup) return;
-    picksMasterToggle.checked = true;
-    picksListEl.style.display = '';
-  });
-  map.on('overlayremove', (e) => {
-    if (e.layer !== communityClusterGroup) return;
-    picksMasterToggle.checked = false;
-    picksListEl.style.display = 'none';
-    if (activeId && entryById[activeId] && entryById[activeId].observation) clearSelection();
-  });
 
   // ---- TRAIL TRACKS ----
   // Real GPS tracks recorded on-site, drawn as trail lines. Add new trails
@@ -4983,14 +4954,18 @@
 
   function applyCombinedFilters() {
     let shown = 0;
+    const picksOn = map.hasLayer(communityClusterGroup);
     allEntries.forEach(s => {
       // Habitat/status filters only apply to entries that actually have those
       // fields -- a landmark with no habitat or status should never be hidden
-      // by those filters, only by its own category checkbox.
+      // by those filters, only by its own category checkbox. An entry with
+      // an `observation` (a Community Pick) also depends on the Picks toggle,
+      // since its row lives in the same A-Z list as verified species.
       const categoryOk = categoryState[s.category];
       const habitatOk = !s.habitat || habitatState[s.habitat];
       const statusOk = !s.status || statusState[s.status];
-      const visible = categoryOk && habitatOk && statusOk;
+      const picksOk = !s.observation || picksOn;
+      const visible = categoryOk && habitatOk && statusOk && picksOk;
       const group = s.observation ? communityClusterGroup : speciesClusterGroup;
       if (visible) {
         shown++;
@@ -5005,27 +4980,37 @@
     filterUi.update(shown);
   }
 
+  // One collapsed-by-default section rather than one per category, since the
+  // Trees/Plants/Animals/etc. breakdown already lives in the Filters panel's
+  // Type section -- this is purely for browsing by name. Category sub-headers
+  // inside it are plain labels (no checkbox, not collapsible), for readability.
+  const allBlock = document.createElement('details');
+  allBlock.className = 'category-block';
+
+  const allHead = document.createElement('summary');
+  allHead.className = 'category-head';
+  allHead.innerHTML = `
+    <span class="label">All Species (A-Z)</span>
+    <span class="count">${allEntries.length}</span>
+  `;
+  allBlock.appendChild(allHead);
+
   Object.keys(categoryMeta).forEach(cat => {
     const meta = categoryMeta[cat];
-    const items = species.filter(s => s.category === cat);
+    const items = allEntries.filter(s => s.category === cat).sort((a, b) => a.name.localeCompare(b.name));
     if (items.length === 0) return;
 
-    const block = document.createElement('div');
-    block.className = 'category-block';
-
-    const head = document.createElement('label');
-    head.className = 'category-head';
-    head.innerHTML = `
-      <input type="checkbox" checked autocomplete="off" data-category="${cat}">
+    const subhead = document.createElement('div');
+    subhead.className = 'species-subhead';
+    subhead.innerHTML = `
       <span class="dot" style="background:${meta.color}"></span>
       <span class="label">${meta.label}</span>
       <span class="count">${items.length}</span>
     `;
-    block.appendChild(head);
+    allBlock.appendChild(subhead);
 
     const list = document.createElement('div');
     list.className = 'species-list';
-    list.id = `list-${cat}`;
 
     items.forEach(s => {
       const row = document.createElement('button');
@@ -5037,11 +5022,9 @@
       list.appendChild(row);
     });
 
-    block.appendChild(list);
-    container.appendChild(block);
-
-    head.querySelector('input').addEventListener('change', (e) => setFilter('category', cat, e.target.checked));
+    allBlock.appendChild(list);
   });
+  if (allEntries.length > 0) container.appendChild(allBlock);
 
   // ---- FILTERS CONTROL (an icon button on the map, beside the layers button) ----
   // One place for everything that decides which pins are visible: type, habitat,
@@ -5066,9 +5049,30 @@
           <span class="filters-badge" id="filters-badge" aria-hidden="true"></span>
         </button>
         <div class="filters-panel" id="filters-panel" role="group" aria-label="Map filters" hidden>
+          <div class="fp-section-title">Show</div>
+          <label class="fp-row">
+            <input type="checkbox" id="filters-sightings-toggle" autocomplete="off">
+            <span class="dot" style="background:#3d6b8a"></span>
+            <span>Community Sightings</span>
+          </label>
+          <p class="sightings-note" id="sightings-note">Real sightings logged by naturalists near the park, via iNaturalist.</p>
+          <label class="fp-row">
+            <input type="checkbox" id="filters-picks-toggle" checked autocomplete="off">
+            <span class="dot" style="background:#2a8f86"></span>
+            <span>Community Picks</span>
+          </label>
           <div id="filters-groups"></div>
           <div class="filters-sightings" id="filters-sightings" hidden>
-            <div class="fp-section-title">Community Sightings</div>
+            <div class="fp-section-title">Sighting types</div>
+            <div class="sightings-sub-filters visible" id="sightings-sub-filters">
+              <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="plants"> Plants</label>
+              <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="fungi"> Fungi &amp; Lichens</label>
+              <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="birds"> Birds</label>
+              <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="mammals"> Mammals</label>
+              <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="herps"> Reptiles &amp; Amphibians</label>
+              <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="insects"> Insects &amp; Spiders</label>
+              <label class="filter-check"><input type="checkbox" checked autocomplete="off" data-bucket="other"> Other Wildlife</label>
+            </div>
           </div>
           <div class="fp-footer">
             <span class="fp-summary" id="filters-summary" aria-live="polite"></span>
@@ -5117,12 +5121,74 @@
     });
   });
 
-  // Sighting-type checkboxes live in this panel too. They are moved here, not copied,
-  // so the existing Community Sightings code keeps working untouched.
+  // ---- SHOW: Community Sightings and Community Picks toggles ----
+  // These live in the Filters panel alongside Type/Habitat/Native status, since
+  // all of them are "what shows on the map" controls -- the native Layers menu
+  // stays reserved for base maps, Trails, and Areas. Neither layer is registered
+  // with the Layers control, so Leaflet's overlayadd/overlayremove never fire for
+  // them; layeradd/layerremove fire for any add/remove from anywhere, and are the
+  // single source of truth that updates the UI.
   const filtersSightingsSection = filtersBox.querySelector('#filters-sightings');
-  filtersSightingsSection.appendChild(sightingsSubFilters);
-  map.on('overlayadd overlayremove', e => {
-    if (e.layer === sightingsLayer) filtersSightingsSection.hidden = !map.hasLayer(sightingsLayer);
+  const sightingsSubFilters = filtersBox.querySelector('#sightings-sub-filters');
+  const sightingsToggle = filtersBox.querySelector('#filters-sightings-toggle');
+  const picksToggle = filtersBox.querySelector('#filters-picks-toggle');
+  const sightingsNoteEl = filtersBox.querySelector('#sightings-note');
+  const SIGHTINGS_DEFAULT_NOTE = sightingsNoteEl.textContent;
+
+  // Browsers restore checkbox states on page load/refresh based on what was
+  // last clicked, independent of the HTML's declared default -- forcing known
+  // values here keeps what's on screen honest.
+  sightingsToggle.checked = false;
+  picksToggle.checked = true;
+  filtersSightingsSection.hidden = true;
+  sightingsSubFilters.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.checked = true;
+    sightingBucketState[cb.dataset.bucket] = true;
+  });
+
+  sightingsToggle.addEventListener('change', (e) => {
+    if (e.target.checked) map.addLayer(sightingsLayer); else map.removeLayer(sightingsLayer);
+  });
+
+  map.on('layeradd', (e) => {
+    if (e.layer !== sightingsLayer) return;
+    sightingsEnabled = true;
+    sightingsToggle.checked = true;
+    filtersSightingsSection.hidden = false;
+    if (!sightingsLoaded) fetchCommunitySightings(); else applySightingFilters();
+  });
+
+  map.on('layerremove', (e) => {
+    if (e.layer !== sightingsLayer) return;
+    sightingsEnabled = false;
+    sightingsToggle.checked = false;
+    filtersSightingsSection.hidden = true;
+    hideStatus();
+    applySightingFilters();
+  });
+
+  sightingsSubFilters.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      sightingBucketState[e.target.dataset.bucket] = e.target.checked;
+      applySightingFilters();
+    });
+  });
+
+  picksToggle.addEventListener('change', (e) => {
+    if (e.target.checked) map.addLayer(communityClusterGroup); else map.removeLayer(communityClusterGroup);
+  });
+
+  map.on('layeradd', (e) => {
+    if (e.layer !== communityClusterGroup) return;
+    picksToggle.checked = true;
+    applyCombinedFilters();
+  });
+
+  map.on('layerremove', (e) => {
+    if (e.layer !== communityClusterGroup) return;
+    picksToggle.checked = false;
+    if (activeId && entryById[activeId] && entryById[activeId].observation) clearSelection();
+    applyCombinedFilters();
   });
 
   // Place the panel under the button, right-aligned, and cap its height so it never runs
@@ -5777,8 +5843,8 @@
     'JFMAMJJASOND'.split('').forEach(l => labels.appendChild(el('span', '', l)));
     area.appendChild(labels);
     const maxMonth = MONTH_NAMES[S.months.indexOf(mmax)];
-    // Months with hardly any records, worked out from the data so the wording stays true after a refresh.
-    const quietNames = S.months.map((c, i) => c <= 0.1 * mmax ? MONTH_NAMES[i] : null).filter(Boolean);
+    // Months with hardly any records (at most 10 percent of the peak month and 3 percent of all records), worked out from the data so the wording stays true after a refresh.
+    const quietNames = S.months.map((c, i) => c <= Math.min(0.1 * mmax, 0.03 * S.total) ? MONTH_NAMES[i] : null).filter(Boolean);
     const quietText = quietNames.length
       ? quietNames.slice(0, -1).join(', ') + (quietNames.length > 1 ? ' and ' : '') + quietNames[quietNames.length - 1] + (quietNames.length > 1 ? ' are' : ' is') + ' barely covered, so'
       : 'Coverage is uneven, so';
@@ -6056,11 +6122,24 @@
     activeId = id;
     markerById[id].setIcon(iconFor(s, true));
     rowById[id].classList.add('active');
-    const openGroup = rowById[id].closest('details.picks-group');
-    if (openGroup) openGroup.open = true;
+    // The A-Z list is collapsed by default; open it so the highlighted row is visible.
+    const listBlock = rowById[id].closest('details.category-block');
+    if (listBlock) listBlock.open = true;
 
-    map.panTo([s.lat, s.lng]);
+    // Render before flying so the card's real height is known: on a phone the
+    // card is a bottom sheet that overlaps the map, so centering on the raw pin
+    // would land it behind the sheet. Shifting the map's own center down by half
+    // the sheet's height puts the pin in the middle of what is still visible.
+    // Math.max: zoom in to at least 18, but never zoom out from a closer view.
     renderInfoPanel(s);
+    const targetZoom = Math.max(map.getZoom(), 18);
+    if (isPhoneWidth()) {
+      const sheetHeight = infoPanel.offsetHeight;
+      const targetPoint = map.project([s.lat, s.lng], targetZoom).add([0, sheetHeight / 2]);
+      map.flyTo(map.unproject(targetPoint, targetZoom), targetZoom);
+    } else {
+      map.flyTo([s.lat, s.lng], targetZoom);
+    }
     closeSidebarDrawer();
     infoPanel.classList.add('open');
   }
