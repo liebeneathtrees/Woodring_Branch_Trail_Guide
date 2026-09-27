@@ -18,7 +18,12 @@
 <meta property="og:title" content="Woodring Branch Recreation Area Field Guide">
 <meta property="og:description" content="An interactive, mobile-friendly field guide to the trees, plants, and animals of the Woodring Branch Recreation Area at Carters Lake, near Ellijay, Georgia.">
 <meta property="og:url" content="https://liebeneathtrees.github.io/Woodring_Branch_Trail_Guide/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://liebeneathtrees.github.io/Woodring_Branch_Trail_Guide/share-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Woodring Branch Recreation Area Field Guide">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://liebeneathtrees.github.io/Woodring_Branch_Trail_Guide/share-card.png">
 <meta name="twitter:title" content="Woodring Branch Recreation Area Field Guide">
 <meta name="twitter:description" content="An interactive, mobile-friendly field guide to the trees, plants, and animals of the Woodring Branch Recreation Area at Carters Lake, near Ellijay, Georgia.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
@@ -42,6 +47,8 @@
     --plant-color: #b8862b;
     --animal-color: #a0522d;
     --line: #d8cfba;
+    --accent: #e0ac4f;
+    --accent-light: var(--accent);
   }
 
   * { box-sizing: border-box; }
@@ -651,6 +658,76 @@
      sidebar, so it needs darker text to stay readable. */
   .filters-panel .sightings-note { color: #6b6253; margin: 0 0 6px 25px; }
   .filters-panel .sightings-note.is-error { color: #a0452b; }
+
+  /* ---- SHARING ---- */
+  .card-share-btn {
+    float: right;
+    display: inline-flex; align-items: center; gap: 5px;
+    margin: -4px 0 0 10px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.8rem; font-weight: 600;
+    color: var(--forest);
+    background: rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.16);
+    border-radius: 16px;
+    padding: 6px 11px;
+    cursor: pointer;
+  }
+  .challenge-share { margin: 10px 0 6px; }
+  .challenge-share[hidden] { display: none; }
+  .share-toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: var(--parchment);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.85rem;
+    padding: 10px 16px; border-radius: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+    opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 1500;
+  }
+  .share-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ---- PHOTO PINS ---- */
+  .snap-btn { margin: 10px 0 4px; }
+  .mypin-photo-preview { display: block; width: 100%; max-height: 190px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; }
+  .mypin-photo-preview[hidden] { display: none; }
+  .mypin-thumb { width: 52px; height: 52px; object-fit: cover; border-radius: 6px; flex: 0 0 52px; cursor: pointer; }
+  .mypin-row { display: flex; gap: 10px; align-items: flex-start; }
+  .popup-photo { display: block; width: 100%; max-width: 220px; max-height: 150px; object-fit: cover; border-radius: 6px; margin: 6px 0; cursor: pointer; }
+  .photo-viewer { position: fixed; inset: 0; z-index: 1400; background: rgba(10,14,8,0.94); display: flex; align-items: center; justify-content: center; }
+  .photo-viewer[hidden] { display: none; }
+  .photo-viewer img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .photo-viewer-close { position: absolute; top: calc(14px + env(safe-area-inset-top, 0px)); right: 14px; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,0.18); color: #fff; font-size: 1.1rem; cursor: pointer; }
+  .leaflet-control-snap a { display: flex; align-items: center; justify-content: center; }
+  .leaflet-control-snap svg { width: 18px; height: 18px; }
+
+  /* ---- WHAT'S NEAR ME ---- */
+  .near-me { margin: 4px 0 10px; }
+  .near-me-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.9rem; font-weight: 600;
+    background: rgba(224,172,79,0.16);
+    color: var(--accent-light);
+    border: 1px solid rgba(224,172,79,0.45);
+    border-radius: 10px;
+    padding: 11px 14px;
+    cursor: pointer;
+  }
+  .near-me-btn[aria-expanded="true"] { background: rgba(224,172,79,0.26); }
+  .near-me-status { font-size: 0.8rem; color: #c9d4bf; margin: 10px 2px 6px; line-height: 1.45; }
+  .near-row {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left;
+    background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.08);
+    color: var(--parchment); font: inherit; cursor: pointer;
+    padding: 9px 2px;
+  }
+  .near-row .dot { flex: 0 0 10px; width: 10px; height: 10px; border-radius: 50%; }
+  .near-row .nm { flex: 1 1 auto; min-width: 0; }
+  .near-row .nm strong { display: block; font-weight: 500; font-size: 0.92rem; }
+  .near-row .nm em { display: block; font-size: 0.76rem; color: #b9c6ae; }
+  .near-row .dist { flex: 0 0 auto; text-align: right; font-size: 0.82rem; color: var(--accent-light); font-weight: 600; white-space: nowrap; }
+  .near-row .dist small { display: block; font-weight: 400; color: #b9c6ae; font-size: 0.72rem; }
+  .near-row .found-mark { color: #9fd49a; margin-left: 4px; }
 
   /* Leaflet's own CSS sets z-index: 1000 on .leaflet-bottom itself (the
      positioned container that holds the attribution, zoom, and locate
@@ -1402,6 +1479,7 @@
   .drawer-backdrop { display: none; }
   .sidebar-mobile-header { display: none; }
   .info-close-btn { display: none; }
+  .tabbar, .sheet-head { display: none; }
 
   @media (max-width: 760px) {
     html, body { height: 100%; }
@@ -1590,6 +1668,140 @@
     .category-head input:checked::after { left: 5px; top: 2px; width: 5px; height: 9px; }
     .filter-check { padding: 7px 0; }
     .filter-check input { width: 17px; height: 17px; }
+
+    /* ---- Phone app shell: bottom tab bar + bottom sheets ----
+       The tab bar replaces the hamburger menu. The sidebar becomes a sheet
+       that slides up from the tab bar showing only the current tab's
+       sections, and the species card becomes a draggable sheet with a half
+       and a full height. Desktop is unaffected. */
+    :root {
+      --topbar-h: calc(68px + env(safe-area-inset-top, 0px));
+      --tabbar-h: calc(58px + env(safe-area-inset-bottom, 0px));
+    }
+    html, body { overscroll-behavior: none; }
+    .main { padding-bottom: var(--tabbar-h); }
+    .mobile-hamburger { display: none; }
+
+    .tabbar {
+      display: flex;
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      height: var(--tabbar-h);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+      background: var(--forest-deep);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      z-index: 1050;
+    }
+    .tabbar button {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      color: rgba(242,236,221,0.72);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 500;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      padding: 6px 0 4px;
+    }
+    .tabbar button svg { width: 23px; height: 23px; }
+    .tabbar button.active { color: var(--accent-light); }
+
+    /* Sidebar as a sheet above the tab bar (overrides the old slide-in drawer). */
+    .sidebar {
+      inset: auto 0 var(--tabbar-h) 0;
+      top: calc(var(--topbar-h) + 8px);
+      height: auto;
+      transform: translateY(calc(100% + var(--tabbar-h)));
+      border-radius: 16px 16px 0 0;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.3);
+      padding-top: 0;
+      padding-bottom: 24px;
+      overscroll-behavior: contain;
+    }
+    .sidebar.open { transform: translateY(0); }
+    .sidebar.dragging, .info-panel.dragging { transition: none; }
+    .sidebar-mobile-header { display: none; }
+    .drawer-backdrop { bottom: var(--tabbar-h); }
+    .sheet-head { display: flex; }
+
+    .sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      margin: 0 -24px 8px;
+      padding: 22px 24px 10px;
+      background: var(--forest);
+      touch-action: none;
+      cursor: grab;
+    }
+    .sheet-head::before, .info-panel::before {
+      content: "";
+      position: absolute;
+      top: 8px; left: 50%;
+      width: 40px; height: 5px;
+      margin-left: -20px;
+      border-radius: 3px;
+      background: rgba(242,236,221,0.35);
+    }
+    .sheet-title {
+      font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--parchment);
+    }
+    .sheet-close {
+      background: rgba(255,255,255,0.12);
+      border: none;
+      color: var(--parchment);
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    /* Only the current tab's sections show in the sheet. */
+    .sidebar[data-tab="species"] > :not([data-tab~="species"]):not([data-tab="all"]),
+    .sidebar[data-tab="challenge"] > :not([data-tab~="challenge"]):not([data-tab="all"]),
+    .sidebar[data-tab="pins"] > :not([data-tab~="pins"]):not([data-tab="all"]),
+    .sidebar[data-tab="more"] > :not([data-tab~="more"]):not([data-tab="all"]) { display: none !important; }
+    .sidebar[data-tab="more"] .sidebar-title-block { display: block; margin-top: 4px; }
+
+    /* Species card: half height by default, drag the handle up for full. */
+    .info-panel {
+      bottom: var(--tabbar-h);
+      padding-top: 30px;
+      padding-bottom: 20px;
+      overscroll-behavior: contain;
+      transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .info-panel::before { background: rgba(42,35,24,0.25); }
+    .share-toast { bottom: calc(var(--tabbar-h) + 14px); }
+    .card-share-btn { margin-right: 64px; }
+    .info-panel.full { max-height: calc(100svh - var(--topbar-h) - var(--tabbar-h) - 8px); }
+
+    /* Map buttons (filters, layers) sit under the sheets, not on top of them. */
+    .leaflet-top { z-index: 940 !important; }
+
+    /* Species tab leads with the list; the month's highlights follow it. */
+    .sheet-head { order: -2; }
+    .sidebar[data-tab="species"] #near-me,
+    .sidebar[data-tab="species"] #sidebar-categories { order: -1; }
+
+    /* A tab that is one section doesn't need that section's own heading. */
+    .sidebar[data-tab="challenge"] #challenge-details > summary,
+    .sidebar[data-tab="pins"] details:has(#mypins-list) > summary { display: none; }
     .filter-check input:checked::after { left: 4.5px; top: 1.5px; width: 4.5px; height: 8px; }
   }
 </style>
@@ -1616,6 +1828,29 @@
 
 <div class="drawer-backdrop" id="drawer-backdrop"></div>
 
+<nav class="tabbar" id="tabbar" aria-label="Sections">
+  <button type="button" data-tab="map" class="active" aria-current="page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4z"/><path d="M9 4v13M15 6.5v13"/></svg>
+    <span>Map</span>
+  </button>
+  <button type="button" data-tab="species">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-9 5-14 15-14 0 10-5 15-14 15"/><path d="M5 19 13 11"/></svg>
+    <span>Species</span>
+  </button>
+  <button type="button" data-tab="challenge">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg>
+    <span>Challenge</span>
+  </button>
+  <button type="button" data-tab="pins">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.3"/></svg>
+    <span>My Pins</span>
+  </button>
+  <button type="button" data-tab="more">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg>
+    <span>More</span>
+  </button>
+</nav>
+
 <div class="mypin-backdrop" id="mypin-backdrop"></div>
 <div class="mypin-modal" id="mypin-modal">
   <h3 id="mypin-modal-title">Save a Personal Pin</h3>
@@ -1640,49 +1875,97 @@
   <label class="mypin-label" for="mypin-notes-input">Notes</label>
   <textarea id="mypin-notes-input" class="mypin-input mypin-textarea" placeholder="Anything else worth remembering..."></textarea>
 
+  <label class="mypin-label">Photo</label>
+  <div class="mypin-photo">
+    <img id="mypin-photo-preview" class="mypin-photo-preview" alt="Photo for this pin" hidden>
+    <div class="mypin-category-choices">
+      <button type="button" class="mypin-cat-btn" id="mypin-photo-btn">Add a photo</button>
+      <button type="button" class="mypin-cat-btn" id="mypin-photo-remove" hidden>Remove photo</button>
+    </div>
+    <p class="mypin-coords" id="mypin-photo-status"></p>
+  </div>
+
   <div class="mypin-modal-actions">
     <button type="button" id="mypin-cancel-btn" class="mypin-btn-secondary">Cancel</button>
     <button type="button" id="mypin-save-btn" class="mypin-btn-primary">Save Pin</button>
   </div>
 </div>
 
+<input type="file" id="mypin-photo-input" accept="image/*" hidden>
+<input type="file" id="snap-input" accept="image/*" capture="environment" hidden>
+<div class="photo-viewer" id="photo-viewer" role="dialog" aria-label="Pin photo" hidden>
+  <img id="photo-viewer-img" alt="Pin photo">
+  <button type="button" class="photo-viewer-close" id="photo-viewer-close" aria-label="Close photo">&#10005;</button>
+</div>
+
 <div class="help-backdrop" id="help-backdrop"></div>
 <div class="help-modal" id="help-modal">
   <button type="button" class="help-close-btn" id="help-close-btn">Close &#10005;</button>
   <h2 class="help-title">Help &amp; Instructions</h2>
-  <p class="help-updated">Last updated: September 7, 2026</p>
+  <p class="help-updated">Last updated: September 26, 2026</p>
+
+  <h4>Getting around on a phone</h4>
+  <p>The bar along the bottom has five tabs. <strong>Map</strong> shows the full map. <strong>Species</strong> has "What's near me?", the A-Z species list, what's in season this month, and how species connect. <strong>Challenge</strong> has the Trail Challenge and the quiz. <strong>My Pins</strong> holds your own pins and photos. <strong>More</strong> has About &amp; Visiting Info, Trails, By the Numbers, these instructions, and contact details. Each tab slides up as a sheet over the map: tap the same tab again, tap Map, tap the &#10005;, or drag the sheet down by its top edge to close it. On a computer, all of these sections are in the menu on the left instead.</p>
+  <p>A species card opens at half height so the map stays visible. Drag its top edge up to read it full screen, and down to shrink or close it; tapping the top edge switches between the two heights.</p>
 
   <h4>Getting around the map</h4>
-  <p>Pan by dragging and zoom with the +/&minus; buttons or a pinch gesture. The layer switcher in the top-right corner of the map lets you change the base map between Street map, Satellite, OpenTopoMap, and USGS Topo: the same panel also has checkboxes for Community Sightings, Trails, and Areas. When you're zoomed out, nearby pins group into a numbered circle so the map doesn't get cluttered: zoom in, or tap the circle, to spread them back apart.</p>
+  <p>Pan by dragging and zoom with the +/&minus; buttons or a pinch gesture. Two icons sit at the top right of the map, and they control two different things. The <strong>layers icon</strong> (stacked squares) switches the base map between Satellite, OpenTopoMap, USGS Topo, and Street map, and toggles Trails and Areas on or off: it's for the map itself. The <strong>funnel icon</strong> next to it controls what's shown on top of that map: Type, Habitat, and Native status, plus Community Sightings and Community Picks. If you're looking to change what the map looks like, use layers; if you're looking to change which pins are showing, use the funnel. At the bottom right are the <strong>camera button</strong> (snap a photo pin), the <strong>location button</strong> (show where you are), and zoom. When you're zoomed out, nearby pins group into a numbered circle so the map doesn't get cluttered: zoom in, or tap the circle, to spread them back apart. Teal-ringed pins are Community Picks; plain pins are species verified in person for this guide.</p>
 
   <h4>Exploring species</h4>
-  <p>Pins are grouped into Trees, Plants &amp; Wildflowers, Animals, and Landmarks in the menu. Tap a pin on the map or a name in the list to open its field notes, organized into tabs: Overview, Ecology, Uses (edible/medicinal, where relevant), Caution (only shown when there's a genuine hazard), and Connections (links to ecologically related species you can tap through to). Each card also shows a Habitat badge and a Native/Introduced/Invasive status badge.</p>
-  <p>The funnel button at the top right of the map, next to the layer switcher, opens a panel with Type, Habitat, and Native status checkboxes. They work together: a pin only shows when it passes all three. The panel also shows how many pins are showing, and Show all turns every filter back on.</p>
+  <p>Every species is in one A-Z list (under the Species tab on phones), grouped by Trees, Plants &amp; Wildflowers, Animals, and so on. Tap a pin on the map or a name in the list to open its field notes, organized into tabs: Overview, Ecology, Uses (edible/medicinal, where relevant), Caution (only shown when there's a genuine hazard), and Connections (links to ecologically related species you can tap through to). Each card also shows a Habitat badge, a Native/Introduced/Invasive status badge, a Role chip summarizing its ecosystem job, and, for Community Picks, a teal badge and a credit box naming the observer.</p>
+  <p>The funnel button opens a panel with a "Show" section at the top (Community Sightings and Community Picks), followed by Type, Habitat, and Native status checkboxes. They all work together: a pin only shows when it passes every check. The panel also shows how many pins are showing, and Show all turns every filter back on.</p>
+
+  <h4>Sharing</h4>
+  <p>The <strong>Share</strong> button on any card sends a link that opens straight to that species. On a phone it opens your share sheet (text, email, social apps); on a computer it copies the link. The address bar also changes to match whichever card is open, so you can copy a link from there too. In the Trail Challenge, <strong>Share my progress</strong> makes an image of your found list to share or save.</p>
+
+  <h4>Community Picks</h4>
+  <p>Beyond the species verified in person for this guide, the "Community Picks" checkbox in the funnel panel adds real, iNaturalist-documented species into the same list, each marked with a teal ring on its map pin and a credit box on its card naming the observer and linking to the original observation. A pin here means the species was documented at that spot, not that it's guaranteed to still be there today. Uncheck the box to hide them and see only the field-verified species.</p>
+
+  <h4>How It All Connects</h4>
+  <p>This section (under the Species tab on phones) lists every real ecological relationship between two species in the guide: who eats whom, who pollinates or spreads whom, who depends on whom for food or shelter. Tap either name in a pair to jump straight to its card.</p>
+
+  <h4>Trail Challenge</h4>
+  <p>A self-guided checklist for your walk, under the Challenge tab on phones. "Starter 10" is a hand-picked set of species that are easy to recognize and represent the park's habitats and native/invasive story; "In season now" shows whatever matches the current month; "All" covers every species in the guide. Tap a box (here or the "I found this one" button on a card) to mark it found: your list is saved only on this device, and nothing is sent anywhere. Once you've found at least one on the list you're viewing, "Share my progress" makes an image of it. Reset clears your list.</p>
+
+  <h4>Test Yourself</h4>
+  <p>A short quiz (also under the Challenge tab on phones) generated fresh from the species cards each time, covering ecosystem roles, fun facts, scientific names, seasonal timing, and the links between species, so it never goes stale as content is added. Each answer comes with a short explanation and a link back to the card. If you've found at least 5 species in the Trail Challenge, you can choose to be quizzed only on those.</p>
+
+  <h4>Woodring Branch Recreation Area by the Numbers</h4>
+  <p>A snapshot (under More on phones) of what naturalists have recorded here on iNaturalist: how many observations, how many species, which months see the most activity, and the most-recorded species overall. It's a real sample of what's been documented, not a full census, and it's refreshed periodically from a new export rather than updating live.</p>
 
   <h4>Trails &amp; areas</h4>
-  <p>Recorded trails appear as green dashed lines with their distance and elevation gain listed under "Trails" in the menu. Shaded areas mark the boundary of a specific place (like a meadow or a habitat zone) rather than a walking path, listed under "Areas." Both can be toggled on or off from the map's layer switcher.</p>
+  <p>Trails appear as dashed lines, listed under "Trails" (under More on phones) with their length: tap one to find it on the map. Shaded areas, where the guide has them, mark the boundary of a specific place (like a meadow or a habitat zone) rather than a walking path, listed under "Areas." Both can be turned on or off from the map's layer switcher.</p>
 
   <h4>Community sightings</h4>
-  <p>This optional layer pulls in real, community-submitted observations from iNaturalist near the park - a separate thing from the curated species pins above, since these are individual sightings rather than field-guide writeups. Turn it on from the menu (or the map's layer switcher), then open the funnel Filters button on the map to show just birds, plants, insects, and so on. Tap any dot to see the photo, date, and a link back to the original observation.</p>
+  <p>This optional layer pulls in real, community-submitted observations from iNaturalist near the park - a separate thing from both the verified species and the Community Picks above, since these are raw individual sightings rather than field-guide writeups. Turn it on from the "Show" section in the funnel Filters panel, which then reveals a second set of checkboxes there to show just birds, plants, insects, and so on. Tap any dot to see the photo, date, and a link back to the original observation.</p>
 
   <h4>Finding your location</h4>
-  <p>The navigation arrow button near the zoom controls shows your position on the map and follows you as you walk. This needs your permission the first time, only works on the live, secure website (not a locally saved file), and works best on a phone with GPS: accuracy will vary, especially under heavy tree cover.</p>
+  <p>The location button (navigation arrow) near the zoom controls shows your position on the map as a blue dot and follows you as you walk. On phones with a compass, a blue arrow on the dot shows which way you're facing (iPhones ask permission for this the first time). "What's near me?" at the top of the species list shows the 15 closest pins with their distance and direction, updating as you walk, with a check mark on any you've already found: tap one to open its card. Location needs your permission the first time, only works on the live, secure website (not a locally saved file), and works best on a phone with GPS: accuracy will vary, especially under heavy tree cover. Your location is never sent anywhere.</p>
 
   <h4>Saving your own pins</h4>
-  <p>Long-press anywhere on the map to drop a personal pin for something you've found. First, choose whether the pin should sit exactly where you pressed, or at your live GPS location instead (useful if your press was a rough guess but your actual position is more precise). Then pick Plant, Animal, or Not Sure, and add a name or guess and any notes. These show up as solid red circles, the same size as Community Sightings dots but a different color, and are saved privately on this device.</p>
-  <p>From the "My Pins" section of the menu, you can:</p>
-  <p><strong>Download for email</strong>: exports one pin (or all of them) as a text file to send to the park guide's maintainer for consideration, along with your own photo attached separately.</p>
-  <p><strong>Export/Upload My Data</strong>: a different pair of buttons for your own continuity. Export saves everything to a file you keep, and Upload reads that file back in later, on this device or another one, adding anything new without creating duplicates.</p>
+  <p>Long-press anywhere on the map (right-click on a computer) to drop a personal pin for something you've found. First, choose whether the pin should sit exactly where you pressed, or at your live GPS location instead (useful if your press was a rough guess but your actual position is more precise). Then pick Plant, Animal, or Not Sure, add a name or guess and any notes, and optionally a photo from your camera or library. Or tap the camera button on the map (or "Snap a photo pin" under My Pins) to take a picture first: the pin form opens with the photo attached and your GPS location selected. Your pins show up as solid red circles and are saved privately on this device. Pins with a photo show a thumbnail in the list and in the map popup: tap it to see the photo full screen.</p>
+  <p>From My Pins, you can:</p>
+  <p><strong>Download for email</strong> (or <strong>Send</strong>, for pins with a photo): exports one pin (or all of them) to send to the park guide's maintainer for consideration. On phones, pins with photos open your share sheet so the note and photo go out together, for example in a new email; elsewhere the note and photo download as separate files. Photos are shrunk and stored only on this device.</p>
+  <p><strong>Export/Upload My Data</strong>: a different pair of buttons for your own continuity. Export saves everything, photos included, to a file you keep, and Upload reads that file back in later, on this device or another one, adding anything new without creating duplicates.</p>
+  <p>Tip: on iPhone, add the guide to your Home Screen (Share, then Add to Home Screen). Safari can clear saved data for websites you haven't visited in a while, but not for guides added to the Home Screen, so this keeps your found list, pins, and photos safe.</p>
 
   <h4>This month at the park</h4>
-  <p>The highlighted box near the top of the menu shows whatever's currently flowering, fruiting, or otherwise in season, based on your device's own clock: tap an entry to jump straight to that species.</p>
+  <p>The highlighted box shows whatever's currently flowering, fruiting, or otherwise in season, based on your device's own clock: tap an entry to jump straight to that species. On a computer it's near the top of the menu; on phones it's under the Species tab, below the list.</p>
+
+  <h4>Using the guide offline</h4>
+  <p>Cell signal can be weak around the lake, so this guide is built to work without a connection. Open it once while you have signal, then check <strong>Use Offline</strong> (under More on phones): it says "Ready" once the guide is saved on your device. After that, every species card, the Trail Challenge, the quiz, and your pins and photos work offline, and a banner tells you when you've lost signal.</p>
+  <p>Map tiles you've already looked at are kept. To be sure an area is there later, zoom to it while connected and tap <strong>Save this map view</strong>: it shows about how many tiles and megabytes that takes before saving. <strong>Remove saved tiles</strong> frees the space again, and <strong>Add to home screen</strong> keeps the guide like an app. The location dot and "What's near me?" use your phone's GPS, which usually keeps working without cell signal. Community Sightings show the last set that loaded, and sharing or sending pins waits until you have signal again.</p>
 
   <h4>Questions, comments, or suggestions</h4>
-  <p>A "Questions, Comments &amp; Suggestions" section near the bottom of the menu has a direct email link for general feedback. If you'd like to suggest a specific plant or animal be added to the guide, use a personal pin's Download option instead, so your coordinates and notes come through with it.</p>
+  <p>A "Questions, Comments &amp; Suggestions" section (at the bottom of the menu, or under More on phones) has a direct email link for general feedback. If you'd like to suggest a specific plant or animal be added to the guide, save a personal pin and use its Download or Send option instead, so your coordinates, notes, and photo come through with it.</p>
 </div>
 
 <div class="layout">
   <aside class="sidebar">
+    <div class="sheet-head" data-tab="all">
+      <h2 class="sheet-title" id="sheet-title">Species</h2>
+      <button type="button" class="sheet-close" id="sheet-close-btn" aria-label="Close">&#10005;</button>
+    </div>
     <div class="sidebar-mobile-header">
       <div class="site-logo">
         <svg class="logo-icon" width="26" height="30" viewBox="0 0 38 42" aria-hidden="true">
@@ -1807,6 +2090,7 @@
       <summary>My Pins</summary>
       <div class="about-content">
         <p>Long-press anywhere on the map to drop a personal pin for something you've spotted. These are saved only on this device.</p>
+        <button type="button" class="near-me-btn snap-btn" id="snap-pin-btn"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Snap a photo pin</span></button>
         <div class="trails-list" id="mypins-list" style="margin-top: 12px;"></div>
         <button type="button" id="mypins-export-all-btn" class="mobile-btn" style="margin-top: 10px; display: none;">Download All for Email</button>
 
@@ -1825,6 +2109,17 @@
 
     <hr class="divider">
 
+    <section class="near-me" id="near-me" data-tab="species">
+      <button type="button" class="near-me-btn" id="near-me-btn" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 21 3l-8 18-2-8-8-2z"/></svg>
+        <span id="near-me-label">What's near me?</span>
+      </button>
+      <div id="near-me-body" hidden>
+        <p class="near-me-status" id="near-me-status" aria-live="polite"></p>
+        <div id="near-me-list"></div>
+      </div>
+    </section>
+
     <div id="sidebar-categories"></div>
 
     <hr class="divider">
@@ -1840,6 +2135,7 @@
         </div>
         <div class="challenge-bar"><span id="challenge-bar-fill"></span></div>
         <div class="challenge-progress-text" id="challenge-progress-text"></div>
+        <button type="button" class="near-me-btn challenge-share" id="challenge-share-btn" hidden><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 13v7h14v-7"/></svg><span>Share my progress</span></button>
         <div id="challenge-list"></div>
         <p class="challenge-msg" id="challenge-msg"></p>
         <button type="button" class="challenge-reset" id="challenge-reset">Reset my list</button>
@@ -1891,7 +2187,7 @@
     <div class="contact-block">
       <p class="filter-section-title" style="margin-bottom: 6px;">Questions, Comments &amp; Suggestions</p>
       <p style="font-size: 0.85rem;">For general questions or feedback, email us directly at <a href="#" id="contact-email-link"></a>.</p>
-      <p style="font-size: 0.82rem; color: #a9baa1;">To suggest a specific plant or animal for the guide, save a personal pin instead (see "My Pins" above) and use its Download option to send it along with a photo.</p>
+      <p style="font-size: 0.82rem; color: #a9baa1;">To suggest a specific plant or animal for the guide, save a personal pin instead (see My Pins) and use its Download option to send it along with a photo.</p>
     </div>
   </aside>
 
@@ -4448,7 +4744,10 @@
   // "Find me" / follow-mode location control. Requires HTTPS and browser
   // location permission -- won't work over file:// or plain http://.
   // GPS accuracy will vary under tree canopy, same as the recorded trails.
-  L.control.locate({
+  // Your-location dot and arrow get their own layer above the species pins
+  // (markers are 600, popups 700), so a nearby pin or cluster can't hide them.
+  map.createPane('locatePane').style.zIndex = 650;
+  const locateControl = L.control.locate({
     position: 'bottomright',
     follow: true,
     setView: 'untilPanOrZoom',
@@ -4456,6 +4755,12 @@
     drawCircle: true,
     drawMarker: true,
     showPopup: false,
+    // Heading arrow from the phone's compass (asks permission on iPhone the
+    // first time the button is tapped). The plugin's default arrow is a tiny
+    // 9 x 6 triangle; this one is big enough to read at a glance on the trail.
+    showCompass: true,
+    markerStyle: { pane: 'locatePane', className: 'leaflet-control-locate-marker', color: '#fff', fillColor: '#2A93EE', fillOpacity: 1, weight: 3, opacity: 1, radius: 9 },
+    compassStyle: { pane: 'locatePane', fillColor: '#2A93EE', fillOpacity: 1, weight: 2, color: '#fff', opacity: 1, radius: 9, width: 16, depth: 14 },
     strings: {
       title: "Show my location"
     },
@@ -4717,21 +5022,104 @@
   const openListBtn = document.getElementById('open-list-btn');
   const closeListBtn = document.getElementById('close-list-btn');
 
+  // Carried over from this guide's earlier code.
+  const COMMUNITY_COLOR = '#2a8f86';
+
   function openSidebarDrawer() {
+    if (!sidebarEl.dataset.tab) sidebarEl.dataset.tab = 'species';
     sidebarEl.classList.add('open');
     backdropEl.classList.add('visible');
+    syncTabBar(sidebarEl.dataset.tab);
   }
 
   function closeSidebarDrawer() {
     sidebarEl.classList.remove('open');
     backdropEl.classList.remove('visible');
+    syncTabBar('map');
   }
+
+  // ---- PHONE TAB BAR ----
+  // Each sidebar section is assigned to one tab; on phones the sidebar sheet
+  // shows only the current tab's sections (see the .sidebar[data-tab] CSS).
+  // On desktop the tab bar is hidden and these attributes do nothing.
+  const TAB_TITLES = { species: 'Species', challenge: 'Challenge', pins: 'My Pins', more: 'More' };
+  const tabbarEl = document.getElementById('tabbar');
+  const sheetTitleEl = document.getElementById('sheet-title');
+  const tabButtons = [...tabbarEl.querySelectorAll('button[data-tab]')];
+
+  function tabForSection(el) {
+    if (el.dataset.tab) return el.dataset.tab;
+    if (el.tagName === 'HR' || el.classList.contains('sidebar-mobile-header') || el.classList.contains('how-to')) return 'none';
+    if (el.id === 'sidebar-categories' || el.id === 'seasonal-widget') return 'species';
+    if (el.querySelector('#mypins-list')) return 'pins';
+    if (el.id === 'challenge-details' || el.id === 'quiz-details') return 'challenge';
+    if (el.querySelector('#connections-web, .status-legend')) return 'species';
+    return 'more';  // title, help, about, trails, areas, numbers, contact
+  }
+  [...sidebarEl.children].forEach(el => { el.dataset.tab = tabForSection(el); });
+
+  // Sections a dedicated tab should open expanded.
+  const TAB_AUTO_OPEN = { species: '#sidebar-categories > details', challenge: '#challenge-details', pins: 'details:has(#mypins-list)' };
+
+  function syncTabBar(tab) {
+    // Looks the buttons up each time so it is safe to call before this section runs.
+    document.querySelectorAll('#tabbar button[data-tab]').forEach(b => {
+      const on = b.dataset.tab === tab;
+      b.classList.toggle('active', on);
+      if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+  }
+
+  function setTab(tab) {
+    if (tab === 'map') { closeSidebarDrawer(); return; }
+    if (sidebarEl.classList.contains('open') && sidebarEl.dataset.tab === tab) { closeSidebarDrawer(); return; }
+    sidebarEl.dataset.tab = tab;
+    sheetTitleEl.textContent = TAB_TITLES[tab] || '';
+    const autoSel = TAB_AUTO_OPEN[tab];
+    if (autoSel) {
+      let d = null;
+      try { d = sidebarEl.querySelector(autoSel); } catch (e) { d = null; }
+      if (!d && tab === 'pins') { const l = document.getElementById('mypins-list'); d = l && l.closest('details'); }
+      if (d) d.open = true;
+    }
+    sidebarEl.scrollTop = 0;
+    openSidebarDrawer();
+  }
+  tabButtons.forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  document.getElementById('sheet-close-btn').addEventListener('click', closeSidebarDrawer);
+
+  // Drag a sheet by its top strip. onEnd(dy) decides what happens; a tap
+  // (almost no movement) calls onTap. Content below the strip scrolls normally.
+  function makeSheetDraggable(sheet, isHandle, onEnd, onTap) {
+    let startY = null, dy = 0, pid = null;
+    sheet.addEventListener('pointerdown', e => {
+      if (!isHandle(e)) return;
+      startY = e.clientY; dy = 0; pid = e.pointerId;
+      sheet.classList.add('dragging');
+      try { sheet.setPointerCapture(pid); } catch (err) {}
+    });
+    sheet.addEventListener('pointermove', e => {
+      if (startY === null || e.pointerId !== pid) return;
+      dy = e.clientY - startY;
+      sheet.style.transform = `translateY(${dy > 0 ? dy : dy * 0.25}px)`;
+    });
+    const end = e => {
+      if (startY === null || (e && e.pointerId !== pid)) return;
+      sheet.classList.remove('dragging');
+      sheet.style.transform = '';
+      startY = null;
+      if (Math.abs(dy) < 6) { if (onTap) onTap(); } else onEnd(dy);
+    };
+    sheet.addEventListener('pointerup', end);
+    sheet.addEventListener('pointercancel', end);
+  }
+  makeSheetDraggable(sidebarEl,
+    e => !!e.target.closest('.sheet-head') && !e.target.closest('.sheet-close'),
+    dy => { if (dy > 70) closeSidebarDrawer(); });
 
   openListBtn.addEventListener('click', openSidebarDrawer);
   closeListBtn.addEventListener('click', closeSidebarDrawer);
   backdropEl.addEventListener('click', closeSidebarDrawer);
-
-  const COMMUNITY_COLOR = '#2a8f86';
 
   function makeIcon(category, active, status, community) {
     const color = categoryMeta[category].color;
@@ -5311,26 +5699,29 @@
     try { localStorage.setItem(FOUND_KEY, JSON.stringify([...foundSet])); } catch (err) { /* ignore */ }
   }
 
+  // Everything the Trail Challenge and cards can mark found (this guide's cards are all Community Picks).
+  function featurePool() { return communityPicks.slice(); }
+
   let challengeSet = 'starter';
   const challengeListEl = document.getElementById('challenge-list');
-  document.getElementById('challenge-all-tab').textContent = `All ${communityPicks.length}`;
+  document.getElementById('challenge-all-tab').textContent = `All ${featurePool().length}`;
 
   function challengeEntries() {
     if (challengeSet === 'starter') return STARTER_IDS.map(id => entryById[id]).filter(Boolean);
-    if (challengeSet === 'season') return communityPicks.filter(p => getCurrentPhenologyLabel(p));
-    return communityPicks.slice();
+    if (challengeSet === 'season') return featurePool().filter(p => getCurrentPhenologyLabel(p));
+    return featurePool().slice();
   }
 
   function challengeMessage(total) {
     if (total === 0) return 'Look for the plant or animal, then tap its box. Tap a name to see where it was recorded and what it does in the forest.';
-    if (total >= communityPicks.length) return `You found all ${total}. Consider adding your own sightings to iNaturalist so other naturalists can see them too.`;
+    if (total >= featurePool().length) return `You found all ${total}. Consider adding your own sightings to iNaturalist so other naturalists can see them too.`;
     if (total >= 25) return `${total} species found. You are reading this forest like a naturalist.`;
     if (total >= 10) return `${total} species found. Notice which ones share a habitat, and check the connections panel to see how they depend on each other.`;
     return `${total} found so far. Every find counts.`;
   }
 
   function refreshFoundMarks() {
-    communityPicks.forEach(p => { if (rowById[p.id]) rowById[p.id].classList.toggle('found', foundSet.has(p.id)); });
+    featurePool().forEach(p => { if (rowById[p.id]) rowById[p.id].classList.toggle('found', foundSet.has(p.id)); });
     const btn = document.querySelector('#info-panel .found-btn');
     if (btn) {
       const on = foundSet.has(btn.dataset.id);
@@ -5371,6 +5762,7 @@
     document.getElementById('challenge-bar-fill').style.width = pct + '%';
     document.getElementById('challenge-progress-text').textContent = list.length ? `${done} of ${list.length} found` : '';
     document.getElementById('challenge-msg').textContent = challengeMessage(foundSet.size);
+    document.getElementById('challenge-share-btn').hidden = done === 0;
   }
 
   document.getElementById('challenge-tabs').addEventListener('click', (ev) => {
@@ -6085,6 +6477,13 @@
 
   // ---- SELECTION / INFO PANEL ----
   const infoPanel = document.getElementById('info-panel');
+  // Phone: drag the card's top strip up for full height, down to shrink or close; tap it to toggle.
+  makeSheetDraggable(infoPanel, infoHandle,
+    dy => {
+      if (dy < -40) infoPanel.classList.add('full');
+      else if (dy > 60) { if (infoPanel.classList.contains('full')) infoPanel.classList.remove('full'); else clearSelection(); }
+    },
+    () => infoPanel.classList.toggle('full'));
 
   // What the field-notes panel says when nothing is selected. While the guide
   // has no species yet, say so instead of pointing at an empty list.
@@ -6095,7 +6494,13 @@
   }
   infoPanel.innerHTML = emptyInfoHTML();
 
+  function infoHandle(e) {
+    if (!isPhoneWidth() || e.target.closest('button, a, input')) return false;
+    return e.clientY - infoPanel.getBoundingClientRect().top < 34;
+  }
   function clearSelection() {
+    infoPanel.classList.remove('full');
+    if (entryById[location.hash.slice(1)]) history.replaceState(null, '', location.pathname + location.search);
     if (activeId) {
       const prev = entryById[activeId];
       markerById[activeId].setIcon(iconFor(prev, false));
@@ -6141,7 +6546,9 @@
       map.flyTo([s.lat, s.lng], targetZoom);
     }
     closeSidebarDrawer();
+    infoPanel.classList.remove('full');
     infoPanel.classList.add('open');
+    if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
   }
 
   // Credit line for Community Picks: who recorded the observation, when, how
@@ -6260,6 +6667,7 @@
     infoPanel.innerHTML = `
       <div class="info-content">
         <button type="button" class="info-close-btn" id="info-close-btn">Close &#10005;</button>
+        <button type="button" class="card-share-btn" id="card-share-btn" aria-label="Share ${s.name}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 13v7h14v-7"/></svg>Share</button>
         <div class="category-tag" style="color:${meta.color}">${categorySingular[s.category] || meta.label}</div>
         <h2>${s.name}</h2>
         <p class="sci-name">${s.sciName}</p>
@@ -6272,6 +6680,7 @@
     `;
 
     infoPanel.querySelector('#info-close-btn').addEventListener('click', clearSelection);
+    infoPanel.querySelector('#card-share-btn').addEventListener('click', () => shareEntry(s));
 
     const foundBtn = infoPanel.querySelector('.found-btn');
     if (foundBtn) {
@@ -6293,6 +6702,105 @@
       });
     });
   }
+
+  // ---- WHAT'S NEAR ME ----
+  // Lists every pin by distance from the visitor, nearest first, updating as
+  // they walk. Uses its own location watch (so opening the list doesn't pan
+  // the map away), and stops watching when the list is hidden or the phone
+  // sheet closes. Nothing leaves the device.
+  const NEAR_MAX = 15;
+  const nearBtn = document.getElementById('near-me-btn');
+  const nearBody = document.getElementById('near-me-body');
+  const nearStatus = document.getElementById('near-me-status');
+  const nearList = document.getElementById('near-me-list');
+  const nearLabel = document.getElementById('near-me-label');
+  let nearWatch = null, nearOn = false, nearLast = null;
+
+  function metersBetween(a, b) {
+    const R = 6371000, p = Math.PI / 180;
+    const x = Math.sin((b.lat - a.lat) * p / 2) ** 2 +
+      Math.cos(a.lat * p) * Math.cos(b.lat * p) * Math.sin((b.lng - a.lng) * p / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(x));
+  }
+  function compassPoint(a, b) {
+    const p = Math.PI / 180;
+    const y = Math.sin((b.lng - a.lng) * p) * Math.cos(b.lat * p);
+    const x = Math.cos(a.lat * p) * Math.sin(b.lat * p) - Math.sin(a.lat * p) * Math.cos(b.lat * p) * Math.cos((b.lng - a.lng) * p);
+    const deg = (Math.atan2(y, x) / p + 360) % 360;
+    return ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(deg / 45) % 8];
+  }
+  function fmtDistance(m) {
+    const ft = m * 3.28084;
+    if (ft < 1000) return `${Math.max(10, Math.round(ft / 10) * 10)} ft`;
+    const mi = m / 1609.34;
+    return `${mi < 10 ? mi.toFixed(1) : Math.round(mi)} mi`;
+  }
+  function foundIds() {
+    try { return new Set(JSON.parse(localStorage.getItem(FOUND_KEY) || '[]')); } catch (e) { return new Set(); }
+  }
+
+  function renderNear(pos) {
+    nearLast = pos;
+    const me = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    const found = foundIds();
+    const rows = allEntries.filter(e => typeof e.lat === 'number' && typeof e.lng === 'number')
+      .map(e => ({ e, m: metersBetween(me, e) }))
+      .sort((a, b) => a.m - b.m)
+      .slice(0, NEAR_MAX);
+    const accFt = Math.round(pos.coords.accuracy * 3.28084);
+    const nearest = rows.length ? rows[0].m : 0;
+    let note = `Nearest ${rows.length} of ${allEntries.length}, updating as you walk. Your location is accurate to about ${accFt} ft`;
+    note += pos.coords.accuracy > 50 ? ', so treat short distances as rough.' : '.';
+    if (nearest > 3000) note = `You're about ${fmtDistance(nearest)} from the nearest pin in the park, so this list is most useful on site. ` + note;
+    nearStatus.textContent = note;
+    nearList.innerHTML = rows.map(({ e, m }) => {
+      const color = (categoryMeta[e.category] || {}).color || '#999';
+      return `<button type="button" class="near-row" data-id="${e.id}">
+        <span class="dot" style="background:${color}"></span>
+        <span class="nm"><strong>${e.name}${found.has(e.id) ? '<span class="found-mark" aria-label="found">&#10003;</span>' : ''}</strong><em>${e.sciName || ''}</em></span>
+        <span class="dist">${fmtDistance(m)}<small>${compassPoint(me, e)}</small></span>
+      </button>`;
+    }).join('');
+  }
+
+  function nearError(err) {
+    const msgs = {
+      1: 'Location permission was turned down. To use this, allow location for this site in your browser settings.',
+      2: "Your location isn't available right now. Try again in a moment, ideally with a clear view of the sky.",
+      3: 'Finding your location took too long. Try again in a moment.'
+    };
+    nearStatus.textContent = msgs[err && err.code] || "Your location isn't available on this device.";
+  }
+
+  function startNear() {
+    if (!('geolocation' in navigator)) { nearError(null); return; }
+    if (nearWatch !== null) return;
+    if (!nearLast) { nearStatus.textContent = 'Finding your location...'; nearList.innerHTML = ''; }
+    nearWatch = navigator.geolocation.watchPosition(renderNear, nearError,
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
+  }
+  function stopNear() {
+    if (nearWatch !== null && 'geolocation' in navigator) navigator.geolocation.clearWatch(nearWatch);
+    nearWatch = null;
+  }
+  function setNear(on) {
+    nearOn = on;
+    nearBtn.setAttribute('aria-expanded', String(on));
+    nearBody.hidden = !on;
+    nearLabel.textContent = on ? 'Hide nearby list' : "What's near me?";
+    if (on) startNear(); else stopNear();
+  }
+  nearBtn.addEventListener('click', () => setNear(!nearOn));
+  nearList.addEventListener('click', e => {
+    const row = e.target.closest('.near-row');
+    if (row) selectSpecies(row.dataset.id);
+  });
+  // Phone: pause the location watch while the sheet is closed, resume when it reopens on the list.
+  new MutationObserver(() => {
+    if (!nearOn) return;
+    const visible = !isPhoneWidth() || (sidebarEl.classList.contains('open') && sidebarEl.dataset.tab === 'species');
+    if (visible) startNear(); else stopNear();
+  }).observe(sidebarEl, { attributes: true, attributeFilter: ['class', 'data-tab'] });
 
   // ---- MY PINS (visitor-saved, local to this device) ----
   // Shown in the exported text file so visitors know where to send a
@@ -6327,6 +6835,86 @@
   let myPins = loadMyPins();
   const myPinsLayer = L.layerGroup().addTo(map);
 
+  // ---- PIN PHOTOS ----
+  // Photos are shrunk on the device (longest side 1600 px, JPEG) and kept in
+  // IndexedDB, which holds far more than localStorage. Each pin keeps only a
+  // small thumbnail data URL (pin.thumb) plus pin.photo = true, so the list
+  // and popups draw instantly. Nothing is uploaded anywhere.
+  const PHOTO_DB = 'woodring-branch-recreation-area_photos';
+  const PHOTO_MAX = 1600, THUMB_MAX = 240;
+  let photoDbPromise = null;
+  function photoDb() {
+    if (!('indexedDB' in window)) return Promise.reject(new Error('no IndexedDB'));
+    if (!photoDbPromise) photoDbPromise = new Promise((res, rej) => {
+      const r = indexedDB.open(PHOTO_DB, 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('photos');
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+    return photoDbPromise;
+  }
+  function photoTx(mode, fn) {
+    return photoDb().then(db => new Promise((res, rej) => {
+      const tx = db.transaction('photos', mode);
+      const req = fn(tx.objectStore('photos'));
+      tx.oncomplete = () => res(req && req.result);
+      tx.onerror = () => rej(tx.error);
+    }));
+  }
+  const putPhoto = (id, blob) => photoTx('readwrite', st => st.put(blob, id));
+  const getPhoto = id => photoTx('readonly', st => st.get(id)).catch(() => null);
+  const deletePhoto = id => photoTx('readwrite', st => st.delete(id)).catch(() => {});
+  const isImageDataUrl = v => typeof v === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(v);
+
+  async function loadImageFile(file) {
+    if (window.createImageBitmap) {
+      try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (e) { /* fall back */ }
+    }
+    return new Promise((res, rej) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(url); res(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('not an image')); };
+      img.src = url;
+    });
+  }
+  function drawScaled(img, max) {
+    const w = img.width, h = img.height, k = Math.min(1, max / Math.max(w, h));
+    const c = document.createElement('canvas');
+    c.width = Math.round(w * k); c.height = Math.round(h * k);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return c;
+  }
+  async function processPhoto(file) {
+    const img = await loadImageFile(file);
+    const full = drawScaled(img, PHOTO_MAX);
+    const blob = await new Promise(res => full.toBlob(res, 'image/jpeg', 0.82));
+    const thumb = drawScaled(img, THUMB_MAX).toDataURL('image/jpeg', 0.72);
+    if (!blob) throw new Error('could not encode');
+    return { blob, thumb };
+  }
+  function escapeHtml(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  const photoViewer = document.getElementById('photo-viewer');
+  const photoViewerImg = document.getElementById('photo-viewer-img');
+  let viewerUrl = null;
+  async function openPhotoViewer(id) {
+    const pin = myPins.find(p => p.id === id);
+    const blob = await getPhoto(id);
+    if (viewerUrl) URL.revokeObjectURL(viewerUrl);
+    viewerUrl = blob ? URL.createObjectURL(blob) : null;
+    photoViewerImg.src = viewerUrl || (pin && pin.thumb) || '';
+    photoViewer.hidden = false;
+  }
+  function closePhotoViewer() {
+    photoViewer.hidden = true;
+    photoViewerImg.removeAttribute('src');
+    if (viewerUrl) { URL.revokeObjectURL(viewerUrl); viewerUrl = null; }
+  }
+  photoViewer.addEventListener('click', closePhotoViewer);
+
   const myPinCategoryMeta = {
     plant:  { label: "Plant",    color: categoryMeta.plant.color },
     animal: { label: "Animal",   color: categoryMeta.animal.color },
@@ -6360,7 +6948,7 @@
       `Coordinates: ${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}`,
       `Date saved: ${new Date(p.createdAt).toLocaleString()}`,
       "",
-      "If you have a photo, please attach it to your email along with this file.",
+      p.photo ? `Photo: attached as ${pinFileBase(p.id)}.jpg` : "If you have a photo, please attach it to your email along with this file.",
       `Send to: ${SUBMISSION_EMAIL}`
     ].join('\n');
   }
@@ -6402,18 +6990,45 @@
     return downloadFile(filename, text, 'text/plain', 'Text file', ['.txt']);
   }
 
+  function pinFileBase(id) { return `woodring-pin-${id}`; }
+
+  // On phones, the share sheet sends the note and photos together (e.g. into
+  // a new email). Where file sharing isn't available, download them instead.
+  async function sendPins(pins, textName) {
+    const text = pins.map(pinToText).join('\n\n========================================\n\n');
+    const files = [];
+    for (const p of pins) {
+      if (!p.photo) continue;
+      const blob = await getPhoto(p.id);
+      if (blob) files.push(new File([blob], `${pinFileBase(p.id)}.jpg`, { type: 'image/jpeg' }));
+    }
+    if (files.length && navigator.canShare && navigator.share) {
+      try {
+        if (navigator.canShare({ files })) {
+          await navigator.share({ files, title: 'Woodring Branch Recreation Area Field Guide pin', text });
+          return;
+        }
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+      }
+    }
+    await downloadTextFile(textName, text);
+    for (const f of files) await downloadFile(f.name, f, 'image/jpeg', 'JPEG photo', ['.jpg']);
+  }
+
   function exportSinglePin(id) {
     const p = myPins.find(pin => pin.id === id);
     if (!p) return;
-    downloadTextFile(`woodring-pin-${id}.txt`, pinToText(p));
+    sendPins([p], `${pinFileBase(id)}.txt`);
   }
 
   function exportAllPins() {
-    const text = myPins.map(pinToText).join('\n\n========================================\n\n');
-    downloadTextFile('woodring-pins-all.txt', text);
+    sendPins(myPins, 'woodring-pins-all.txt');
   }
 
   function deleteMyPin(id) {
+    const gone = myPins.find(p => p.id === id);
+    if (gone && gone.photo) deletePhoto(id);
     myPins = myPins.filter(p => p.id !== id);
     saveMyPinsToStorage();
     renderMyPins();
@@ -6424,13 +7039,14 @@
     return `
       <div class="popup-card">
         <div class="category" style="color:${meta.color}">Your Pin - Unverified</div>
-        <h3>${p.name || 'Unnamed'}</h3>
+        <h3>${escapeHtml(p.name) || 'Unnamed'}</h3>
         <p class="sci-name">${meta.label}</p>
-        ${p.notes ? `<p>${p.notes}</p>` : ''}
+        ${isImageDataUrl(p.thumb) ? `<img class="popup-photo mypin-open-photo" data-id="${p.id}" src="${p.thumb}" alt="Your photo">` : ''}
+        ${p.notes ? `<p>${escapeHtml(p.notes)}</p>` : ''}
         <div class="season">
           <a href="#" class="mypin-popup-edit" data-id="${p.id}">Edit</a>
           &nbsp;&middot;&nbsp;
-          <a href="#" class="mypin-popup-export" data-id="${p.id}">Download for email</a>
+          <a href="#" class="mypin-popup-export" data-id="${p.id}">${p.photo ? 'Send with photo' : 'Download for email'}</a>
           &nbsp;&middot;&nbsp;
           <a href="#" class="mypin-popup-delete" data-id="${p.id}">Delete</a>
         </div>
@@ -6453,6 +7069,9 @@
         document.querySelectorAll('.mypin-popup-delete').forEach(el => {
           el.addEventListener('click', (e) => { e.preventDefault(); map.closePopup(); deleteMyPin(el.dataset.id); });
         });
+        document.querySelectorAll('.leaflet-popup .mypin-open-photo').forEach(el => {
+          el.addEventListener('click', () => openPhotoViewer(el.dataset.id));
+        });
       });
       marker.addTo(myPinsLayer);
     });
@@ -6471,12 +7090,15 @@
     el.innerHTML = myPins.map(p => {
       const meta = myPinCategoryMeta[p.category] || myPinCategoryMeta.unsure;
       return `
-        <div class="trail-item" style="border-left-color:${meta.color}">
-          <div class="trail-name">${p.name || 'Unnamed'} <span style="font-weight:400; font-style:italic; color:#a9baa1;">(${meta.label})</span></div>
+        <div class="trail-item mypin-row" style="border-left-color:${meta.color}">
+          ${isImageDataUrl(p.thumb) ? `<img class="mypin-thumb" data-id="${p.id}" src="${p.thumb}" alt="Photo: ${escapeHtml(p.name) || 'your pin'}">` : ''}
+          <div style="flex:1 1 auto; min-width:0;">
+          <div class="trail-name">${escapeHtml(p.name) || 'Unnamed'} <span style="font-weight:400; font-style:italic; color:#a9baa1;">(${meta.label})</span></div>
           <div class="trail-stats" style="display:flex; gap:12px; margin-top:5px;">
             <button type="button" class="mypin-list-edit" data-id="${p.id}" style="background:none; border:none; color:#b7c4ae; cursor:pointer; padding:0; font-size:0.78rem; text-decoration:underline;">Edit</button>
-            <button type="button" class="mypin-list-export" data-id="${p.id}" style="background:none; border:none; color:#e0ac4f; cursor:pointer; padding:0; font-size:0.78rem; text-decoration:underline;">Download</button>
+            <button type="button" class="mypin-list-export" data-id="${p.id}" style="background:none; border:none; color:var(--accent-light); cursor:pointer; padding:0; font-size:0.78rem; text-decoration:underline;">${p.photo ? 'Send' : 'Download'}</button>
             <button type="button" class="mypin-list-delete" data-id="${p.id}" style="background:none; border:none; color:#e0a58f; cursor:pointer; padding:0; font-size:0.78rem; text-decoration:underline;">Delete</button>
+          </div>
           </div>
         </div>
       `;
@@ -6491,6 +7113,9 @@
     el.querySelectorAll('.mypin-list-delete').forEach(btn => {
       btn.addEventListener('click', () => deleteMyPin(btn.dataset.id));
     });
+    el.querySelectorAll('.mypin-thumb').forEach(img => {
+      img.addEventListener('click', () => openPhotoViewer(img.dataset.id));
+    });
   }
 
   document.getElementById('mypins-export-all-btn').addEventListener('click', exportAllPins);
@@ -6503,12 +7128,23 @@
     mypinsUploadStatus.classList.toggle('is-error', !!isError);
   }
 
-  function exportMyDataFile() {
+  function blobToDataUrl(blob) {
+    return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
+  }
+
+  async function exportMyDataFile() {
+    const photos = {};
+    for (const p of myPins) {
+      if (!p.photo) continue;
+      const blob = await getPhoto(p.id);
+      if (blob) photos[p.id] = await blobToDataUrl(blob);
+    }
     const payload = {
       app: "Woodring Branch Recreation Area Field Guide",
       appId: APP_ID,
       exportedAt: new Date().toISOString(),
-      pins: myPins
+      pins: myPins,
+      photos
     };
     downloadFile(
       'woodring-my-pins.json',
@@ -6529,11 +7165,20 @@
         showUploadStatus('Could not read that file: make sure it\'s a save file exported from this app.', true);
         return;
       }
-      if (!data || Array.isArray(data) || data.appId !== APP_ID || !Array.isArray(data.pins)) {
-        showUploadStatus('That file doesn\'t look like a Woodring Branch save file. Only files exported from this guide can be uploaded.', true);
+      const incoming = Array.isArray(data.pins) ? data.pins : (Array.isArray(data) ? data : null);
+      if (!incoming) {
+        showUploadStatus('That file doesn\'t look like a Woodring Branch Recreation Area save file.', true);
         return;
       }
-      const incoming = data.pins;
+      // Older save files from before this field existed should still be accepted. Accept them
+      // only if every pin already carries this guide's own id prefix --
+      // that's still a reliable sign the file genuinely came from here.
+      const hasValidAppId = data.appId === APP_ID;
+      const isLegacyNorthHallFile = !data.appId && incoming.every(p => p && typeof p.id === 'string' && p.id.startsWith(PIN_ID_PREFIX));
+      if (!hasValidAppId && !isLegacyNorthHallFile) {
+        showUploadStatus('That file doesn\'t look like a Woodring Branch Recreation Area save file. Only files exported from this guide can be uploaded.', true);
+        return;
+      }
       const existingIds = new Set(myPins.map(p => p.id));
       let addedCount = 0;
       let duplicateCount = 0;
@@ -6546,6 +7191,14 @@
         } else if (existingIds.has(p.id)) {
           duplicateCount++;
         } else {
+          if (!isImageDataUrl(p.thumb)) delete p.thumb;
+          const photoUrl = data.photos && data.photos[p.id];
+          if (isImageDataUrl(photoUrl)) {
+            p.photo = true;
+            fetch(photoUrl).then(r => r.blob()).then(b => putPhoto(p.id, b)).catch(() => {});
+          } else {
+            p.photo = false;
+          }
           myPins.push(p);
           existingIds.add(p.id);
           addedCount++;
@@ -6631,7 +7284,7 @@
         mypinCoordsEl.textContent = 'Getting your GPS location\u2026';
       }
     } else {
-      mypinCoordsEl.textContent = `${pendingPinLatLng.lat.toFixed(5)}, ${pendingPinLatLng.lng.toFixed(5)} (where you pressed)`;
+      mypinCoordsEl.textContent = `${pendingPinLatLng.lat.toFixed(5)}, ${pendingPinLatLng.lng.toFixed(5)} (${locPressBtn.textContent === 'Map Center' ? 'center of the map' : 'where you pressed'})`;
     }
   }
 
@@ -6642,7 +7295,7 @@
       if (pinLocationMode === 'gps' && !pendingPinGpsLatLng) {
         refreshMyPinCoordsDisplay();
         if (!navigator.geolocation) {
-          mypinCoordsEl.textContent = 'GPS isn\'t available in this browser - using where you pressed instead.';
+          mypinCoordsEl.textContent = 'GPS isn\'t available in this browser - using the other location instead.';
           pinLocationMode = 'longpress';
           updateMyPinLocationButtons();
           return;
@@ -6653,7 +7306,7 @@
             if (pinLocationMode === 'gps') refreshMyPinCoordsDisplay();
           },
           () => {
-            mypinCoordsEl.textContent = 'Could not get your GPS location - using where you pressed instead.';
+            mypinCoordsEl.textContent = 'Could not get your GPS location - using the other location instead.';
             pinLocationMode = 'longpress';
             updateMyPinLocationButtons();
           },
@@ -6668,9 +7321,75 @@
   let editingPinId = null;
   const mypinModalTitle = document.getElementById('mypin-modal-title');
 
-  function openMyPinModal(latlng) {
+  // Photo attached in the modal but not saved yet: { blob, thumb }, or
+  // photoRemoved when an edit takes an existing photo off.
+  let pendingPhoto = null, photoRemoved = false;
+  const photoPreview = document.getElementById('mypin-photo-preview');
+  const photoBtn = document.getElementById('mypin-photo-btn');
+  const photoRemoveBtn = document.getElementById('mypin-photo-remove');
+  const photoStatus = document.getElementById('mypin-photo-status');
+  const photoInput = document.getElementById('mypin-photo-input');
+  const snapInput = document.getElementById('snap-input');
+  const locPressBtn = document.querySelector('#mypin-location-choices [data-loc="longpress"]');
+
+  let previewUrl = null;
+  // src: the full photo's object URL when we have it (sharp), else the thumbnail.
+  function showPhotoState(thumb, src) {
+    if (previewUrl && previewUrl !== src) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
+    if (src && src.startsWith('blob:')) previewUrl = src;
+    photoPreview.hidden = !thumb;
+    if (thumb) photoPreview.src = src || thumb; else photoPreview.removeAttribute('src');
+    photoRemoveBtn.hidden = !thumb;
+    photoBtn.textContent = thumb ? 'Change photo' : 'Add a photo';
+    photoStatus.textContent = '';
+  }
+  async function takeFile(file) {
+    if (!file) return false;
+    photoStatus.textContent = 'Preparing photo...';
+    try {
+      pendingPhoto = await processPhoto(file);
+      photoRemoved = false;
+      showPhotoState(pendingPhoto.thumb, URL.createObjectURL(pendingPhoto.blob));
+      return true;
+    } catch (e) {
+      photoStatus.textContent = "That file couldn't be read as a photo.";
+      return false;
+    }
+  }
+  photoBtn.addEventListener('click', () => photoInput.click());
+  photoRemoveBtn.addEventListener('click', () => { pendingPhoto = null; photoRemoved = true; showPhotoState(null); });
+  photoInput.addEventListener('change', e => { takeFile(e.target.files[0]); e.target.value = ''; });
+
+  // Snap a photo pin: camera first, then the pin form with the photo attached
+  // and your GPS location selected (falls back to the map center).
+  function startSnap() { snapInput.click(); }
+  snapInput.addEventListener('change', async e => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    openMyPinModal(map.getCenter(), { fromCamera: true });
+    await takeFile(file);
+    const gpsBtn = document.querySelector('#mypin-location-choices [data-loc="gps"]');
+    if (gpsBtn) gpsBtn.click();
+  });
+  document.getElementById('snap-pin-btn').addEventListener('click', startSnap);
+  const SnapControl = L.Control.extend({
+    options: { position: 'bottomright' },
+    onAdd() {
+      const bar = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-snap');
+      bar.innerHTML = '<a href="#" role="button" title="Snap a photo pin" aria-label="Snap a photo pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></a>';
+      L.DomEvent.disableClickPropagation(bar);
+      L.DomEvent.on(bar.firstChild, 'click', ev => { L.DomEvent.preventDefault(ev); startSnap(); });
+      return bar;
+    }
+  });
+  new SnapControl().addTo(map);
+
+  function openMyPinModal(latlng, opts) {
     editingPinId = null;
     mypinModalTitle.textContent = 'Save a Personal Pin';
+    pendingPhoto = null; photoRemoved = false; showPhotoState(null);
+    locPressBtn.textContent = opts && opts.fromCamera ? 'Map Center' : 'Where I Pressed';
     pendingPinLatLng = latlng;
     pendingPinGpsLatLng = null;
     pinLocationMode = 'longpress';
@@ -6689,6 +7408,10 @@
     if (!pin) return;
     editingPinId = id;
     mypinModalTitle.textContent = 'Edit Personal Pin';
+    pendingPhoto = null; photoRemoved = false;
+    showPhotoState(isImageDataUrl(pin.thumb) ? pin.thumb : null);
+    if (pin.photo) getPhoto(id).then(b => { if (b && editingPinId === id && !pendingPhoto && !photoRemoved) showPhotoState(pin.thumb, URL.createObjectURL(b)); });
+    locPressBtn.textContent = 'Where I Pressed';
     pendingPinLatLng = { lat: pin.lat, lng: pin.lng };
     pendingPinGpsLatLng = null;
     pinLocationMode = 'longpress';
@@ -6708,15 +7431,17 @@
     pendingPinLatLng = null;
     pendingPinGpsLatLng = null;
     editingPinId = null;
+    showPhotoState(null);  // also frees the preview's object URL
   }
 
   document.getElementById('mypin-cancel-btn').addEventListener('click', closeMyPinModal);
   mypinBackdrop.addEventListener('click', closeMyPinModal);
 
-  document.getElementById('mypin-save-btn').addEventListener('click', () => {
+  document.getElementById('mypin-save-btn').addEventListener('click', async () => {
     const useGps = pinLocationMode === 'gps' && pendingPinGpsLatLng;
     const finalLatLng = useGps ? pendingPinGpsLatLng : pendingPinLatLng;
     if (!finalLatLng) return;
+    let savedId = editingPinId;
 
     if (editingPinId) {
       const pin = myPins.find(p => p.id === editingPinId);
@@ -6728,8 +7453,9 @@
         pin.lng = finalLatLng.lng;
       }
     } else {
+      savedId = `${PIN_ID_PREFIX}${Date.now()}`;
       myPins.push({
-        id: `${PIN_ID_PREFIX}${Date.now()}`,
+        id: savedId,
         category: selectedMyPinCategory,
         name: mypinNameInput.value.trim(),
         notes: mypinNotesInput.value.trim(),
@@ -6738,7 +7464,31 @@
         createdAt: new Date().toISOString()
       });
     }
-    saveMyPinsToStorage();
+    const pin = myPins.find(p => p.id === savedId);
+    if (pin && pendingPhoto) {
+      try {
+        await putPhoto(savedId, pendingPhoto.blob);
+        pin.photo = true;
+        pin.thumb = pendingPhoto.thumb;
+        // Ask the browser to keep this site's storage (photos included) rather than clearing it when space runs low.
+        if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+      } catch (e) {
+        pin.thumb = pendingPhoto.thumb;  // the full photo couldn't be stored; keep the thumbnail at least
+        pin.photo = false;
+      }
+    } else if (pin && photoRemoved) {
+      deletePhoto(savedId);
+      pin.photo = false;
+      delete pin.thumb;
+    }
+    try {
+      saveMyPinsToStorage();
+    } catch (e) {
+      // localStorage full: keep the pin but drop its thumbnail, then retry
+      if (pin) delete pin.thumb;
+      try { saveMyPinsToStorage(); } catch (e2) {}
+    }
+    pendingPhoto = null; photoRemoved = false;
     renderMyPins();
     closeMyPinModal();
   });
@@ -6751,8 +7501,174 @@
 
   renderMyPins();
 
+
+  // ---- SHARING ----
+  // Links: page#<id> opens that species card, page#challenge opens the Trail
+  // Challenge. Share uses the phone's share sheet where there is one, else
+  // copies the link. The progress image is drawn on the device.
+  const SHARE_PARK = 'Woodring Branch Recreation Area';
+  const CANONICAL_URL = (document.querySelector('link[rel="canonical"]') || {}).href || '';
+  const baseUrl = () => /^https?:/.test(location.protocol) ? location.origin + location.pathname : CANONICAL_URL;
+  // The page's own logo (pine, acorn, ...) as an image for the progress picture, recolored.
+  function logoImage(color) {
+    const svg = document.querySelector('.sidebar-title-block .logo-icon') || document.querySelector('.logo-icon');
+    if (!svg) return Promise.resolve(null);
+    const markup = svg.outerHTML.replace(/var\(--accent\)/g, color)
+      .replace(/<svg /, '<svg xmlns="http://www.w3.org/2000/svg" ').replace(/width="[^"]*" height="[^"]*"/, 'width="380" height="420"');
+    return new Promise(res => {
+      const img = new Image();
+      img.onload = () => res(img);
+      img.onerror = () => res(null);
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(markup);
+    });
+  }
+
+  let toastEl = null, toastTimer = null;
+  function showToast(msg) {
+    if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'share-toast'; toastEl.setAttribute('role', 'status'); document.body.appendChild(toastEl); }
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+  }
+
+  async function shareLink(title, text, url) {
+    if (navigator.share) {
+      try { await navigator.share({ title, text, url }); return; }
+      catch (err) { if (err && err.name === 'AbortError') return; }
+    }
+    try { await navigator.clipboard.writeText(url); showToast('Link copied'); }
+    catch (err) { window.prompt('Copy this link:', url); }
+  }
+
+  function shareEntry(s) {
+    const role = s.role ? `: ${s.role.charAt(0).toLowerCase()}${s.role.slice(1)}` : '';
+    shareLink(`${s.name} | ${SHARE_PARK} Field Guide`, `${s.name}${role}, at ${SHARE_PARK}.`, `${baseUrl()}#${s.id}`);
+  }
+
+  function challengeSetLabel(n) {
+    if (challengeSet === 'starter') return `Starter ${n}`;
+    if (challengeSet === 'season') return `In season: ${MONTH_NAMES[new Date().getMonth()]}`;
+    return `All ${n} species`;
+  }
+
+  // Wrap text into lines that fit maxW; returns the lines.
+  function wrapText(ctx, text, maxW) {
+    const words = text.split(' '), lines = [];
+    let line = '';
+    words.forEach(w => {
+      const t = line ? line + ' ' + w : w;
+      if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t;
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  async function drawProgressImage() {
+    const list = challengeEntries();
+    const found = list.filter(e => foundSet.has(e.id));
+    const W = 1080, H = 1350;
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d');
+    const css = getComputedStyle(document.documentElement);
+    const col = v => css.getPropertyValue(v).trim();
+    const forest = col('--forest') || '#1f3a2e', deep = col('--forest-deep') || '#232d1a';
+    const cream = col('--parchment') || '#f2ecdd', tan = col('--accent-light') || col('--accent') || '#e0ac4f';
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+    const serif = "'Fraunces', Georgia, 'Times New Roman', serif";
+    const sans = "'Inter', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
+
+    ctx.fillStyle = forest; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = deep; ctx.fillRect(0, H - 150, W, 150);
+
+    // logo
+    const logo = await logoImage(tan);
+    if (logo) ctx.drawImage(logo, 90, 90, 99, 109);
+    ctx.fillStyle = cream; ctx.textBaseline = 'alphabetic';
+    ctx.font = `600 34px ${sans}`; ctx.fillText(SHARE_PARK.toUpperCase().split('').join(String.fromCharCode(8202)), 210, 138);
+    ctx.font = `italic 700 58px ${serif}`; ctx.fillText('Field Guide', 210, 200);
+
+    ctx.font = `600 40px ${sans}`; ctx.fillStyle = tan; ctx.fillText('TRAIL CHALLENGE', 90, 350);
+    ctx.fillStyle = cream; ctx.font = `700 150px ${serif}`;
+    ctx.fillText(`${found.length} of ${list.length}`, 84, 505);
+    ctx.font = `500 42px ${sans}`; ctx.fillStyle = 'rgba(242,236,221,0.8)';
+    ctx.fillText(`${challengeSetLabel(list.length)} found`, 90, 570);
+
+    // progress bar
+    const pct = list.length ? found.length / list.length : 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.14)'; ctx.fillRect(90, 610, W - 180, 26);
+    ctx.fillStyle = tan; ctx.fillRect(90, 610, Math.round((W - 180) * pct), 26);
+    if (pct >= 1) { ctx.font = `700 44px ${serif}`; ctx.fillStyle = tan; ctx.fillText('Complete!', 90, 700); }
+
+    // found species, two columns
+    ctx.font = `500 36px ${sans}`;
+    const top = pct >= 1 ? 780 : 730, rowH = 56, colW = (W - 180) / 2, maxRows = 8;
+    const shown = found.slice(0, maxRows * 2);
+    shown.forEach((e, i) => {
+      const x = 90 + (i >= maxRows ? colW : 0), y = top + (i % maxRows) * rowH;
+      ctx.fillStyle = tan; ctx.fillText('\u2713', x, y);
+      ctx.fillStyle = cream;
+      let name = e.name;
+      while (ctx.measureText(name).width > colW - 70 && name.length > 4) name = name.slice(0, -2);
+      if (name !== e.name) name = name.replace(/\s+\S*$/, '') + '...';
+      ctx.fillText(name, x + 50, y);
+    });
+    if (found.length > shown.length) {
+      ctx.fillStyle = 'rgba(242,236,221,0.75)';
+      ctx.fillText(`+ ${found.length - shown.length} more`, 90, top + maxRows * rowH);
+    }
+
+    // footer
+    ctx.fillStyle = 'rgba(242,236,221,0.85)'; ctx.font = `500 30px ${sans}`;
+    const when = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    ctx.fillText(when, 90, H - 85);
+    ctx.fillStyle = tan; ctx.font = `600 30px ${sans}`;
+    const shortUrl = (CANONICAL_URL || baseUrl()).replace(/^https?:\/\//, '').replace(/\/$/, '');
+    wrapText(ctx, shortUrl, W - 180).slice(0, 1).forEach(l => ctx.fillText(l, 90, H - 42));
+    return new Promise(res => c.toBlob(res, 'image/png'));
+  }
+
+  async function shareProgress() {
+    const btn = document.getElementById('challenge-share-btn');
+    btn.disabled = true;
+    try {
+      const blob = await drawProgressImage();
+      if (!blob) throw new Error('no image');
+      const list = challengeEntries();
+      const done = list.filter(e => foundSet.has(e.id)).length;
+      const text = `I found ${done} of ${list.length} on the ${SHARE_PARK} Trail Challenge.`;
+      const file = new File([blob], 'woodring-trail-challenge.png', { type: 'image/png' });
+      if (navigator.canShare && navigator.share && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], title: `${SHARE_PARK} Trail Challenge`, text: `${text} ${baseUrl()}#challenge` }); return; }
+        catch (err) { if (err && err.name === 'AbortError') return; }
+      }
+      await downloadFile(file.name, blob, 'image/png', 'PNG image', ['.png']);
+      showToast('Progress image saved');
+    } catch (err) {
+      showToast("Couldn't make the image on this device");
+    } finally {
+      btn.disabled = false;
+    }
+  }
+  document.getElementById('challenge-share-btn').addEventListener('click', shareProgress);
+
+  function openFromHash() {
+    const key = decodeURIComponent(location.hash.slice(1));
+    if (!key) return;
+    if (entryById[key]) { selectSpecies(key); return; }
+    if (key === 'challenge') {
+      const det = document.getElementById('challenge-details');
+      if (isPhoneWidth()) { if (!(sidebarEl.classList.contains('open') && sidebarEl.dataset.tab === 'challenge')) setTab('challenge'); }
+      else if (det) { det.open = true; det.scrollIntoView({ block: 'start' }); }
+    }
+  }
+  window.addEventListener('hashchange', openFromHash);
+
   // ---- INIT ----
   buildSeasonalWidget();
+  // Open a shared link's card once the map has settled.
+  setTimeout(openFromHash, 300);
 </script>
 
 </body>
